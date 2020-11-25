@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState, useEffect }  from 'react'
 import Link from 'next/link'
 import { Form, Input, Button, Checkbox,Radio} from 'antd';
 import { UserOutlined,LockOutlined } from '@ant-design/icons';
 import Login from '../component/Login'
+import axios from 'axios'
 
 
 const layout = {
@@ -25,25 +26,40 @@ class Demo extends React.Component {
     constructor(props) {
         super(props);
         this.state = { 
-            identity: 'student', 
+            user: 'student', 
         }
         this.onFinish=this.onFinish.bind(this);
         this.onFinishFailed=this.onFinishFailed.bind(this);
         this.handleSizeChange=this.handleSizeChange.bind(this);
     }
+
+
     handleSizeChange = e => {
-        this.setState({ identity: e.target.value });
+        this.setState({ user: e.target.value });
       };
-    onFinish = (values) => {
+    onFinish = async (values) => {
         console.log('Success:', values);
+        console.log(this.state.user)
+        const response = await axios.post('/api/users', {
+          email: values.email,
+          password: values.password
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+
       };
     
     onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
       };
-
+      
   render() {
-    const { identity } = this.state;
+    const { user } = this.state;
       return(
     <Form
       {...layout}
@@ -59,7 +75,7 @@ class Demo extends React.Component {
         <Form.Item
         label = "type"
         >
-        <Radio.Group value={identity} onChange={this.handleSizeChange}>
+        <Radio.Group value={user} onChange={this.handleSizeChange}>
           <Radio.Button value="student">Student</Radio.Button>
           <Radio.Button value="teacher">Teacher</Radio.Button>
           <Radio.Button value="manager">Manager</Radio.Button>
@@ -106,13 +122,12 @@ class Demo extends React.Component {
         </Form.Item>
 
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit" identity={identity}>
+        <Button type="primary" htmlType="submit" user={user}>
           Login
         </Button>
         
         Or <Link href="/registrationpage"><a>register now!</a></Link>
       </Form.Item>
-      <Login></Login>
     </Form>
   
     )};

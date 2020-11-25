@@ -8,9 +8,7 @@ export default function Home() {
     <div className="App">
       <br/>
       <Demo/>
-      <div>
-        
-      </div>
     </div>
   );
 }
+
