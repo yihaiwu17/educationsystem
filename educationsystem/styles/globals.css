@@ -6,6 +6,10 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
+h1{
+  text-align: center;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -13,4 +17,16 @@ a {
 
 * {
   box-sizing: border-box;
+}
+#components-form-demo-normal-login .login-form {
+  max-width: auto;
+}
+#components-form-demo-normal-login .login-form-forgot {
+  float: right;
+}
+#components-form-demo-normal-login .ant-col-rtl .login-form-forgot {
+  float: left;
+}
+#components-form-demo-normal-login .login-form-button {
+  width: auto;
 }

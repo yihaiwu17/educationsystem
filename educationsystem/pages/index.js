@@ -1,11 +1,16 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { Button } from "antd";
+import Demo from '../component/LoginPage'
+import NormalLoginForm from '../component/LoginPage2'
 
 export default function Home() {
   return (
     <div className="App">
-      <Button type="primary">Button</Button>
+      <br/>
+      <Demo/>
+      <div>
+        
+      </div>
     </div>
   );
 }
