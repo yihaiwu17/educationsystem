@@ -1,25 +1,19 @@
 import React from 'react'
-import { Layout, Menu, Breadcrumb, Button,Row,Input  } from 'antd';
+import { Layout, Menu,Input  } from 'antd';
 import {
-  DesktopOutlined,
-  PieChartOutlined,
-  FileOutlined,
-  TeamOutlined,
   UserOutlined,
   SelectOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
-import "../styles/globals.css"
+import '../styles/globals.css'
 import  Router from "next/router";
 import TableInfo from '../component/table'
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 const { Search } = Input;
-
-
 
 class SiderDemo extends React.Component {
   state = {
@@ -36,9 +30,19 @@ class SiderDemo extends React.Component {
     });
   };
 
-  signout = ()=>{
-    Router.push('/')
-  }
+  signout = async()=>{
+        await 
+        fetch("/api/logout",{
+          method: 'post',
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            window.localStorage.removeItem("user");
+            window.localStorage.removeItem("token");
+            Router.push('/')
+          }
+        })
+    };
   
   onSearch = value => console.log(value);
 
@@ -71,7 +75,7 @@ class SiderDemo extends React.Component {
           </Menu>
         </Sider>
         <Layout className="site-layout">
-        <Header className="site-layout-background" style={{ padding: 4,color:"white",fontSize:'20px'}}>
+        <Header className="site-layout-background" style={{ display:"flex",justifyContent:"space-between",padding:4,color:"white",fontSize:'20px'}}>
             {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
               className: 'trigger',
               onClick: this.toggle,
@@ -84,7 +88,6 @@ class SiderDemo extends React.Component {
           <Content style={{ margin: '16px 16px',padding:'5px'}}>
             <Search placeholder="input search text" onSearch={this.onSearch} style={{ width: 500 }} />
             <TableInfo></TableInfo>
-
           </Content>
           <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
         </Layout>

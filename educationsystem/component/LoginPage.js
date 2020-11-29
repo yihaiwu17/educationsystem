@@ -4,6 +4,7 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import axios from "axios";
 import  Router from "next/router";
 import styled from 'styled-components';
+import cookie from "js-cookie";
 
 const StyledButton = styled(Button)`
   &&& {

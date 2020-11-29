@@ -1,5 +1,5 @@
 import { Table,Space } from 'antd';
-import studentData from '../data'
+import { useEffect, useState } from 'react';
 
 const columns = [
     {
@@ -76,6 +76,22 @@ function onChange(pagination, filters, sorter, extra) {
 }
 
 const TableInfo = ()=>{
+    let [status, setStatus] = useState("loading");
+    let [studentData,setStudentData]= useState([])
+
+    useEffect(async ()=>{
+        await fetch("/api/studentInfo")
+        .then(res => res.json() )
+        .then(json => {
+            setStudentData(json)
+            setStatus("success")
+        })
+        .catch(e =>{
+            console.error(e.message);
+            setStatus("error")
+        })
+    },[])
+
     return(
         <>
         <Table columns={columns} dataSource={studentData} onChange={onChange} />
