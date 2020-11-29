@@ -17,9 +17,13 @@
     "less": "^3.12.2",
     "next": "10.0.2",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-app-rewire-styled-components": "^3.0.2",
+    "react-dom": "17.0.1",
+    "styled-components": "^5.2.1"
   },
   "devDependencies": {
-    "miragejs": "^0.1.41"
+    "@babel/preset-env": "^7.12.7",
+    "miragejs": "^0.1.41",
+    "prettier": "^2.2.0"
   }
 }
