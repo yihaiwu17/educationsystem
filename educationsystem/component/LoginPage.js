@@ -29,6 +29,7 @@ class LoginPage extends React.Component {
         password: values.password,
         loginType: values.loginType,
       })
+
       .then((response) => {
         if (response.status === 200) {
           const account = response.data;
@@ -36,6 +37,7 @@ class LoginPage extends React.Component {
           Router.push('/dashboard');
         }
       })
+
       .catch((error) => {
         console.log(error);
         message.error('Login failed! Please check you email and password!');
@@ -62,6 +64,7 @@ class LoginPage extends React.Component {
               onFinishFailed={this.onFinishFailed}
             >
               <h1>课程管理助手</h1>
+
               <Form.Item
                 name="loginType"
                 initialValue="student"
@@ -70,14 +73,12 @@ class LoginPage extends React.Component {
                     required: true,
                     message: 'Please select login type',
                   },
-                ]}
-              >
+                ]}>
+
                 <Radio.Group
                   value={loginType}
                   onChange={(e) => {
-                    this.setState({ loginType: e.target.value });
-                  }}
-                >
+                    this.setState({ loginType: e.target.value });}}>
                   <Radio.Button value="student">Student</Radio.Button>
                   <Radio.Button value="teacher">Teacher</Radio.Button>
                   <Radio.Button value="manager">Manager</Radio.Button>
@@ -128,6 +129,7 @@ class LoginPage extends React.Component {
                   Login
                 </StyledButton>
               </Form.Item>
+              
             </Form>
           </Col>
         </Row>

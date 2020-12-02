@@ -23,6 +23,7 @@ class AppLayout extends React.Component {
     console.log(collapsed);
     this.setState({ collapsed });
   };
+
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,
@@ -40,14 +41,17 @@ class AppLayout extends React.Component {
       }
     });
   };
+
   render() {
+
     const { collapsed } = this.state;
 
     return (
       <Layout style={{ minHeight: '100vh' }}>
+
         <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse}>
-          <div
-            style={{
+          
+          <div style={{
               height: '64px',
               display: 'inline-flex',
               fontSize: '24px',
@@ -56,11 +60,10 @@ class AppLayout extends React.Component {
               alignItems: 'center',
               width: '100%',
               letterSpacing: '5px',
-              textShadow: '5px 1px 5px',
-            }}
-          >
+              textShadow: '5px 1px 5px',}}>
             CMS
           </div>
+
           <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
             <Menu.Item key="1" icon={<UserOutlined />} style={{ marginTop: 0 }}>
               Member List
@@ -71,6 +74,7 @@ class AppLayout extends React.Component {
             </Menu.Item>
           </Menu>
         </Sider>
+
         <Layout className="site-layout">
           <Header
             className="site-layout-background"
@@ -86,15 +90,16 @@ class AppLayout extends React.Component {
             <div onClick={this.toggle} style={{ margin: '25px', cursor: 'pointer' }}>
               {this.state.collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             </div>
+
             <div onClick={this.signOut} style={{ margin: '25px', cursor: 'pointer' }}>
               {this.state.collapsed ? <LogoutOutlined /> : <LogoutOutlined />}
             </div>
           </Header>
-          <Content
-            style={{ background: '#fff', margin: '15px', padding: '15px', minHeight: 'auto' }}
-          >
+
+          <Content style={{ background: '#fff', margin: '15px', padding: '15px', minHeight: 'auto' }}>
             {this.props.children}
           </Content>
+
         </Layout>
       </Layout>
     );

@@ -23,7 +23,9 @@ export function makeServer({ environment = 'test' } = {}) {
       this.passthrough((request) => {
         if (request.url === '/_next/static/development/_devPagesManifest.json') return true;
       });
+
       this.namespace = 'api';
+
       this.get('/users', (schema) => {
         return schema.users.all();
       });
@@ -63,6 +65,7 @@ export function makeServer({ environment = 'test' } = {}) {
           return new Response(400, {}, { message: 'Please check your email or password' });
         }
       });
+      
     },
   });
   return server;
