@@ -1,47 +1,26 @@
-import { Table,Space } from 'antd';
+import { Table, Space, Popconfirm } from 'antd';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const columns = [
-    {
-        title:'ID',
-        dataIndex:'id',
-    },
-    {
+  {
+    title: 'ID',
+    dataIndex: 'id',
+  },
+  {
     title: 'Name',
     dataIndex: 'name',
-    filters: [
-      {
-        text: 'Joe',
-        value: 'Joe',
-      },
-      {
-        text: 'Jim',
-        value: 'Jim',
-      },
-      {
-        text: 'Submenu',
-        value: 'Submenu',
-        children: [
-          {
-            text: 'Green',
-            value: 'Green',
-          },
-          {
-            text: 'Black',
-            value: 'Black',
-          },
-        ],
-      },
-    ],
-    // specify the condition of filtering result
-    // here is that finding the name started with `value`
-    onFilter: (value, record) => record.name.indexOf(value) === 0,
-    sorter: (a, b) => a.name.length - b.name.length,
-    sortDirections: ['descend'],
+    sorter: (a, b) => a['name'].localeCompare(b['name']),
   },
   {
     title: 'Area',
     dataIndex: 'address',
+    width: '10%',
+    filters: [
+      { text: '加拿大', value: '加拿大' },
+      { text: '澳洲', value: '澳洲' },
+      { text: '国内', value: '国内' },
+    ],
   },
   {
     title: 'Email',
@@ -49,23 +28,34 @@ const columns = [
   },
   {
     title: 'Selected Curriculum',
-    dataIndex: 'selected curriculum',
+    dataIndex: 'selectedCurriculm',
+    width: '25%',
   },
   {
     title: 'Student Type',
-    dataIndex: 'student type',
+    dataIndex: 'studentType',
+    width: '15%',
+    filters: [
+      { text: '开发', value: '开发' },
+      { text: '测试', value: '测试' },
+    ],
   },
   {
     title: 'Join Time',
-    dataIndex: 'join time',
+    dataIndex: 'joinTime',
   },
   {
     title: 'Action',
     key: 'action',
     render: (text, record) => (
       <Space size="middle">
-        <a>Edit</a>
-        <a>Delete</a>
+        <Link href={''}>
+          <a>Edit</a>
+        </Link>
+
+        <Popconfirm title="确定删除这个学生?" onConfirm={() => {}} okText="确定" cancelText="取消">
+          <a>Delete</a>
+        </Popconfirm>
       </Space>
     ),
   },
@@ -75,28 +65,36 @@ function onChange(pagination, filters, sorter, extra) {
   console.log('params', pagination, filters, sorter, extra);
 }
 
-const TableInfo = ()=>{
-    let [status, setStatus] = useState("loading");
-    let [studentData,setStudentData]= useState([])
+const TableInfo = () => {
+  let [studentData, setStudentData] = useState([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    showSizeChanger: true,
+  });
 
-    useEffect(async ()=>{
-        await fetch("/api/studentInfo")
-        .then(res => res.json() )
-        .then(json => {
-            setStudentData(json)
-            setStatus("success")
-        })
-        .catch(e =>{
-            console.error(e.message);
-            setStatus("error")
-        })
-    },[])
+  useEffect(async () => {
+    await fetch('/api/students')
+      .then((res) => res.json())
+      .then((json) => {
+        setStudentData(json.students);
+      })
+      .catch((e) => {
+        console.error(e.message);
+      });
+  }, []);
 
-    return(
-        <>
-        <Table columns={columns} dataSource={studentData} onChange={onChange} />
-        </>
-    )
-}
+  return (
+    <>
+      <Table
+        columns={columns}
+        dataSource={studentData}
+        onChange={onChange}
+        rowKey="id"
+        pagination={pagination}
+      />
+    </>
+  );
+};
 
-export default TableInfo
+export default TableInfo;
