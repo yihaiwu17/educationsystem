@@ -23,25 +23,22 @@ class LoginPage extends React.Component {
   }
 
   onFinish = async (values) => {
-    const response = await axios
+    try{
+      const response = await axios
       .post('/api/users', {
         email: values.email,
         password: values.password,
         loginType: values.loginType,
       })
-
-      .then((response) => {
-        if (response.status === 200) {
-          const account = response.data;
-          localStorage.setItem('user', JSON.stringify(account));
-          Router.push('/dashboard');
-        }
-      })
-
-      .catch((error) => {
-        console.log(error);
-        message.error('Login failed! Please check you email and password!');
-      });
+      if (response.status === 200) {
+        const account = response.data;
+        localStorage.setItem('user', JSON.stringify(account));
+        Router.push('/dashboard');
+      }
+    }catch(error){
+      console.log(error)
+      message.error('Login failed! Please check you email and password!');
+    }       
   };
 
   onFinishFailed = (errorInfo) => {

@@ -74,7 +74,7 @@ const TableInfo = () => {
   });
 
   useEffect(async () => {
-    await fetch('/api/students')
+    fetch('/api/students')
       .then((res) => res.json())
       .then((json) => {
         setStudentData(json.students);
@@ -85,7 +85,7 @@ const TableInfo = () => {
   }, []);
 
   return (
-    <>
+
       <Table
         columns={columns}
         dataSource={studentData}
@@ -93,7 +93,6 @@ const TableInfo = () => {
         rowKey="id"
         pagination={pagination}
       />
-    </>
   );
 };
 
