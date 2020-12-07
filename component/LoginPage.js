@@ -4,6 +4,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import Router from 'next/router';
 import styled from 'styled-components';
+import {userType} from './userType'
 
 const StyledButton = styled(Button)`
   &&& {
@@ -15,7 +16,7 @@ class LoginPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loginType: 'student',
+      loginType: "student",
       remember: true,
     };
     this.onFinish = this.onFinish.bind(this);
@@ -25,7 +26,7 @@ class LoginPage extends React.Component {
   onFinish = async (values) => {
     try{
       const response = await axios
-      .post('/api/users', {
+      .post('/api/login', {
         email: values.email,
         password: values.password,
         loginType: values.loginType,
@@ -64,7 +65,7 @@ class LoginPage extends React.Component {
 
               <Form.Item
                 name="loginType"
-                initialValue="student"
+                initialValue = "student"
                 rules={[
                   {
                     required: true,
@@ -76,9 +77,9 @@ class LoginPage extends React.Component {
                   value={loginType}
                   onChange={(e) => {
                     this.setState({ loginType: e.target.value });}}>
-                  <Radio.Button value="student">Student</Radio.Button>
-                  <Radio.Button value="teacher">Teacher</Radio.Button>
-                  <Radio.Button value="manager">Manager</Radio.Button>
+                  <Radio.Button value={userType.student}>Student</Radio.Button>
+                  <Radio.Button value={userType.teacher}>Teacher</Radio.Button>
+                  <Radio.Button value={userType.manager}>Manager</Radio.Button>
                 </Radio.Group>
               </Form.Item>
 

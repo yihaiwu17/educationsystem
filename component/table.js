@@ -1,8 +1,17 @@
-import { Table, Space, Popconfirm } from 'antd';
+import { Table, Space, Popconfirm, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import styled from 'styled-components';
+import { search } from '../services/apiService';
+import { set } from 'js-cookie';
 
-const columns = [
+const Search = styled(Input.Search)`
+  width: 30%;
+  margin-bottom: 16px;
+  display: block;
+`;
+
+const columnData = [
   {
     title: 'ID',
     dataIndex: 'id',
@@ -61,10 +70,6 @@ const columns = [
   },
 ];
 
-function onChange(pagination, filters, sorter, extra) {
-  console.log('params', pagination, filters, sorter, extra);
-}
-
 const TableInfo = () => {
   let [studentData, setStudentData] = useState([]);
   const [pagination, setPagination] = useState({
@@ -73,8 +78,29 @@ const TableInfo = () => {
     showSizeChanger: true,
   });
 
+  function onChange(pagination, filters, sorter, extra) {
+    setPagination({
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+      showSizeChanger: true,
+    });
+    console.log('params', pagination, filters, sorter, extra);
+  }
+
+  async function searchFunction(value) {
+    const params = {
+      page: 1,
+      limit: 10,
+      query: value,
+    };
+    const res = await search(params);
+    console.log(res.data.filter);
+    setStudentData(res.data.filter);
+    setPagination({ current: res.data.page, pageSize: res.data.limit });
+  }
+
   useEffect(async () => {
-    fetch('/api/students')
+    fetch('/api/students', {})
       .then((res) => res.json())
       .then((json) => {
         setStudentData(json.students);
@@ -85,14 +111,20 @@ const TableInfo = () => {
   }, []);
 
   return (
-
+    <>
+      <Search
+        placeholder="input search text"
+        onSearch={searchFunction}
+        style={{ width: 500, marginBottom: '20px' }}
+      />
       <Table
-        columns={columns}
+        columns={columnData}
         dataSource={studentData}
         onChange={onChange}
         rowKey="id"
         pagination={pagination}
       />
+    </>
   );
 };
 
