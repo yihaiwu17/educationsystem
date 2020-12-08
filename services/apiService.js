@@ -9,7 +9,7 @@ const axiosApi = axios.create({
   responseType: 'json',
 });
 
-export const search = async (params) => {
+export const studentApi = async (params) => {
   const res = await axiosApi
     .get(createUrl(firstPaths.students, params))
     .then((res) => res)

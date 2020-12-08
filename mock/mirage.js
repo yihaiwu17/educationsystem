@@ -1,8 +1,8 @@
 // mirage.js
 import { createServer, Model, Response, Server } from 'miragejs';
 import { firstPaths } from '../services/path';
-const students = require('./student.json');
-const users = require('./user.json');
+const students = require('../mock/data/student.json');
+const users = require('../mock/data/user.json');
 
 export function makeServer({ environment = 'test' } = {}) {
   let server = createServer({
@@ -25,23 +25,49 @@ export function makeServer({ environment = 'test' } = {}) {
 
       this.namespace = 'api';
 
-      this.get(firstPaths.students, async (schema, request) => {
+      this.get(firstPaths.students, (schema, request) => {
         const limit = request.queryParams.limit;
         const page = request.queryParams.page;
-        let query = request.queryParams.query || '';
+        const { query } = req.queryParams;
+        let students = schema.db.students.filter((student) => student.name.includes(query));
+        
+        const start = limit * (page - 1)
+        const total = !query ? all.length : students.length;
 
-        const filterTable = schema.db.students.filter((student) => student.name.includes(query));
+        let data = { total, students };
 
-        if (typeof query === 'undefined' || query == '') {
-          return schema.students.all();
+        
+        if (typeof query === 'undefined' || query === '') {
+          students =students.slice(start, start + limit)
+          return new Response(
+            200,
+            {},
+            {
+              code: 0,
+              msg: 'success',
+              data:{
+                ...data,
+                paginator: { limit, page, total }, 
+                students
+              } 
+            }
+          );
         } else {
           return new Response(
             200,
             {},
             {
-              filter: filterTable,
-              limit: limit,
-              page: page,
+              code: 0,
+              msg: 'success',
+              data:{
+                students:students,
+                total:limit,
+                paginator:{
+                  limit,
+                  page,
+                  total: filterTable.length
+                }
+              } 
             }
           );
         }

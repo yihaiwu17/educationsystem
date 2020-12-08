@@ -2,7 +2,8 @@ import { Table, Space, Popconfirm, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
-import { search } from '../services/apiService';
+import { studentApi } from '../services/apiService';
+import axios from 'axios';
 import { set } from 'js-cookie';
 
 const Search = styled(Input.Search)`
@@ -77,6 +78,10 @@ const TableInfo = () => {
     pageSize: 10,
     showSizeChanger: true,
   });
+  const [params, setParams] = useState({
+    page: 1,
+    limit: 10,
+  });
 
   function onChange(pagination, filters, sorter, extra) {
     setPagination({
@@ -87,23 +92,36 @@ const TableInfo = () => {
     console.log('params', pagination, filters, sorter, extra);
   }
 
-  async function searchFunction(value) {
-    const params = {
-      page: 1,
-      limit: 10,
-      query: value,
-    };
-    const res = await search(params);
-    console.log(res.data.filter);
-    setStudentData(res.data.filter);
-    setPagination({ current: res.data.page, pageSize: res.data.limit });
+  const handleOnchange = (e) => {
+    setParams({ ...params, query: e.target.value });
+    console.log(params);
+  };
+
+  async function searchFunction() {
+    console.log(params);
+    const res = await studentApi(params);
+    if (res.status === 200) {
+      console.log('11');
+      setStudentData(res.data.data.students);
+      console.log(res.data);
+      setPagination({
+        current: res.data.data.page,
+        pageSize: res.data.data.limit,
+        showSizeChanger: true,
+      });
+    }
   }
 
   useEffect(async () => {
-    fetch('/api/students', {})
-      .then((res) => res.json())
-      .then((json) => {
-        setStudentData(json.students);
+    await studentApi(params)
+      .then((res) => {
+        setStudentData(res.data.data.students);
+        console.log(res);
+        setPagination({
+          current: res.data.data.page,
+          pageSize: res.data.data.limit,
+          showSizeChanger: true,
+        });
       })
       .catch((e) => {
         console.error(e.message);
@@ -115,6 +133,7 @@ const TableInfo = () => {
       <Search
         placeholder="input search text"
         onSearch={searchFunction}
+        onChange={handleOnchange}
         style={{ width: 500, marginBottom: '20px' }}
       />
       <Table
