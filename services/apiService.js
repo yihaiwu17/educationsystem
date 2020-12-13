@@ -16,3 +16,28 @@ export const studentApi = async (params) => {
     .catch((err) => errorHandler(err));
   return res;
 };
+
+export const deleteStudentApi = async (params) => {
+  const res = await axiosApi
+    .delete(createUrl(firstPaths.students+"/"+secondPaths.delete, params))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
+export const addStudentApi = async (params) => {
+  const res = await axiosApi
+    .post(createUrl(firstPaths.students+"/"+secondPaths.add, params))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
+export const updateStudentApi = async (params) => {
+  const res = await axiosApi
+    .post(createUrl(firstPaths.students+"/"+secondPaths.update, params))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+

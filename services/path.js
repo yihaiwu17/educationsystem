@@ -9,6 +9,7 @@ export const secondPaths = {
   add: 'add',
   edit: 'edit',
   delete: 'delete',
+  update:'update'
 };
 
 export const createUrl = (paths, params) => {
