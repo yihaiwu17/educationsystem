@@ -1,5 +1,5 @@
 // mirage.js
-import { belongsTo, createServer, Factory, hasMany, Model, Response, Server } from 'miragejs';
+import { belongsTo, createServer, hasMany, Model, Response } from 'miragejs';
 import { firstPaths, secondPaths } from '../services/path';
 const students = require('../mock/data/student.json');
 const users = require('../mock/data/user.json');
@@ -42,7 +42,7 @@ export function makeServer({ environment = 'test' } = {}) {
 
       this.namespace = 'api';
 
-      this.get(firstPaths.students, (schema, request) => {
+      this.get('/students', (schema, request) => {
         const limit = request.queryParams.limit;
         const page = request.queryParams.page;
         const { query } = request.queryParams;
@@ -87,7 +87,7 @@ export function makeServer({ environment = 'test' } = {}) {
         );
       });
 
-      this.post(firstPaths.students + '/' + secondPaths.add, (schema, request) => {
+      this.post(firstPaths.students + '/' + secondPaths.add, (schema, req) => {
         const body = JSON.parse(req.requestBody);
         const { name, email, area, type } = body;
         const data = schema.students.create({
@@ -103,7 +103,7 @@ export function makeServer({ environment = 'test' } = {}) {
         return new Response(200, {}, { msg: 'success', code: 200, data });
       });
 
-      this.post(firstPaths.students+'/'+secondPaths.update, (schema, req) => {
+      this.post(firstPaths.students + '/' + secondPaths.update, (schema, req) => {
         const { id, email, name, area, type } = JSON.parse(req.requestBody);
         const target = schema.students.findBy({ id });
 

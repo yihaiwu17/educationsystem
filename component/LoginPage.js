@@ -33,7 +33,8 @@ class LoginPage extends React.Component {
       })
       if (response.status === 200) {
         const account = response.data;
-        localStorage.setItem('user', JSON.stringify(account));
+        localStorage.setItem('cmsUser', JSON.stringify(account));
+
         Router.push('/dashboard');
       }
     }catch(error){

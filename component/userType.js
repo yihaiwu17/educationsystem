@@ -1,5 +1,5 @@
-export const userType={
-    student : 'student',
-    teacher : 'teacher',
-    manager : 'manager',
-}
+export const userType = {
+  student: 'student',
+  teacher: 'teacher',
+  manager: 'manager',
+};

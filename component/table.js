@@ -1,12 +1,11 @@
 import { Table, Space, Popconfirm, Input, Button } from 'antd';
 import React, { useEffect, useState, useCallback } from 'react';
-import Link from 'next/link';
 import styled from 'styled-components';
-import { studentApi,deleteStudentApi  } from '../services/apiService';
+import { studentApi, deleteStudentApi } from '../services/apiService';
 import { debounce, omitBy } from 'lodash';
 import { formatDistanceToNow } from 'date-fns';
-import ModalForm from '../component/modalForm'
-import AddStudentForm from '../component/AddStudentForm'
+import ModalForm from '../component/modalForm';
+import AddStudentForm from '../component/AddStudentForm';
 import { PlusOutlined } from '@ant-design/icons';
 
 const Search = styled(Input.Search)`
@@ -29,7 +28,6 @@ const TableInfo = () => {
     debounce((nextValue) => setQuery(nextValue), 1000),
     []
   );
-
 
   const columnData = [
     {
@@ -71,7 +69,7 @@ const TableInfo = () => {
         { text: 'developer', value: 'developer' },
         { text: 'tester', value: 'tester' },
       ],
-      onFilter:(value,record)=> record.typeName === value,
+      onFilter: (value, record) => record.typeName === value,
     },
     {
       title: 'Join Time',
@@ -83,29 +81,30 @@ const TableInfo = () => {
       key: 'action',
       render: (text, record) => (
         <Space size="middle">
-            <a
-            onClick={()=>{
+          <a
+            onClick={() => {
               setEditingStudent(record);
               setModalDisplay(true);
             }}
-            >Edit</a>
+          >
+            Edit
+          </a>
 
           <Popconfirm
             title="确定删除这个学生?"
             onConfirm={() => {
-              const id = record.id
-              console.log(id)
-              deleteStudentApi({id})
-              .then((res)=>{
-                const deleteInfo = res
-                if(deleteInfo.data.data === true){
-                  const index = studentData.findIndex((item) => item.id === record.id)
-                  const newStudentData = [...studentData]
-                  newStudentData.splice(index,1);
-                  setStudentData(newStudentData)
-                  setTotal(total-1);
+              const id = record.id;
+              console.log(id);
+              deleteStudentApi({ id }).then((res) => {
+                const deleteInfo = res;
+                if (deleteInfo.data.data === true) {
+                  const index = studentData.findIndex((item) => item.id === record.id);
+                  const newStudentData = [...studentData];
+                  newStudentData.splice(index, 1);
+                  setStudentData(newStudentData);
+                  setTotal(total - 1);
                 }
-              })
+              });
             }}
             okText="Confirm"
             cancelText="Cancel"
@@ -116,7 +115,7 @@ const TableInfo = () => {
       ),
     },
   ];
-  
+
   const [isModalDisplay, setModalDisplay] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
   const cancel = () => {
@@ -131,26 +130,25 @@ const TableInfo = () => {
     );
 
     await studentApi(req).then((res) => {
-      console.log(studentInfo)
+      console.log(studentInfo);
       const { studentInfo, total } = res.data.data;
       setStudentData(studentInfo);
       setTotal(total);
     });
   }, [query, pagination]);
 
-
   return (
     <>
       <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            setModalDisplay(true);
-            setEditingStudent(null);
-          }}
-        >
-          Add
-        </Button>
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => {
+          setModalDisplay(true);
+          setEditingStudent(null);
+        }}
+      >
+        Add
+      </Button>
       <Search
         placeholder="input search text"
         onSearch={(value) => setQuery(value)}
@@ -166,8 +164,7 @@ const TableInfo = () => {
         rowKey="id"
         pagination={{ ...pagination, total }}
       />
-      
-        
+
       <ModalForm
         title={!!editingStudent ? 'Edit Student' : 'Add Student'}
         centered
@@ -180,7 +177,7 @@ const TableInfo = () => {
              * update local data if editing success
              */
             if (!!editingStudent) {
-              console.log(editingStudent)
+              console.log(editingStudent);
               const index = data.findIndex((item) => item.id === student.id);
 
               data[index] = student;
@@ -192,7 +189,6 @@ const TableInfo = () => {
           student={editingStudent}
         />
       </ModalForm>
-
     </>
   );
 };

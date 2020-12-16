@@ -10,6 +10,8 @@ import {
 import '../styles/globals.css';
 import Router from 'next/router';
 import styled from 'styled-components';
+import generateKey from '../lib/side-nav'
+import { useUserType } from './login-state';
 
 const { Header, Content, Sider } = Layout;
 
@@ -35,23 +37,54 @@ class AppLayout extends React.Component {
       method: 'post',
     }).then((response) => {
       if (response.status === 200) {
-        window.localStorage.removeItem('user');
+        window.localStorage.removeItem('cmsUser');
         window.localStorage.removeItem('token');
         Router.push('/');
       }
     });
   };
 
-  render() {
+  renderMenuItems(data, parent = ''){
+    const userType = useUserType()
 
+    return data.map((item,index) => {
+      const key = generateKey(item,index)
+
+      if(item.subNav && item.subNav.length){
+        return (
+          <Menu.SubMenu key={key} title={item.label} icon ={item.icon}>
+            {this.renderMenuItems(item.subNav, item.path.join('/'))}
+          </Menu.SubMenu>
+        )
+      }else{
+        return(
+          <Menu.Item key={key} title={item.label} icon = {item.icon}>
+           {!!item.path.length || item.label.toLocaleLowerCase() === 'overview' ? (
+             <Link
+              href={['/dashboard', userType, parent, ...item.path]
+                .filter((item) => !!item)
+                .join('/')}
+                replace
+             >
+                {item.label}
+             </Link>
+           ):(
+             item.label
+           )} 
+          </Menu.Item>
+        )
+      }
+    })
+  }
+
+  render() {
     const { collapsed } = this.state;
 
     return (
       <Layout style={{ minHeight: '100vh' }}>
-
         <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse}>
-          
-          <div style={{
+          <div
+            style={{
               height: '64px',
               display: 'inline-flex',
               fontSize: '24px',
@@ -60,7 +93,9 @@ class AppLayout extends React.Component {
               alignItems: 'center',
               width: '100%',
               letterSpacing: '5px',
-              textShadow: '5px 1px 5px',}}>
+              textShadow: '5px 1px 5px',
+            }}
+          >
             CMS
           </div>
 
@@ -96,10 +131,11 @@ class AppLayout extends React.Component {
             </div>
           </Header>
 
-          <Content style={{ background: '#fff', margin: '15px', padding: '15px', minHeight: 'auto' }}>
+          <Content
+            style={{ background: '#fff', margin: '15px', padding: '15px', minHeight: 'auto' }}
+          >
             {this.props.children}
           </Content>
-
         </Layout>
       </Layout>
     );

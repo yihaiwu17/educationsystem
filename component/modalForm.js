@@ -2,7 +2,6 @@ import { Button } from 'antd';
 import Modal from 'antd/lib/modal';
 import React, { PropsWithChildren } from 'react';
 
-
 export default function ModalForm(props) {
   const { children, cancel, ...others } = props;
 

@@ -1,11 +1,11 @@
 import { Button, Form, Input, Select } from 'antd';
 import React from 'react';
-import {addStudentApi,updateStudentApi} from '../services/apiService'
+import { addStudentApi, updateStudentApi } from '../services/apiService';
 import styled from 'styled-components';
 
 const validateMessages = {
-    required: '${name} is required',
-  };
+  required: '${name} is required',
+};
 
 export default function AddStudentForm(props) {
   const [form] = Form.useForm();
