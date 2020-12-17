@@ -1,4 +1,4 @@
-import {Router,useRouter} from 'next/router';
+import Router from 'next/router';
 import { useEffect } from 'react';
 import {storage, userInfo} from '../services/storage';
 
@@ -19,8 +19,3 @@ export function useLoginState(){
     return storage.userInfo
 }
 
-export function useUserType(){
-    const router = useRouter();
-
-    return storage.userType || (router.pathname.split('/')[2])
-}

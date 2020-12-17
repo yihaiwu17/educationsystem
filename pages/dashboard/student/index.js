@@ -1,9 +1,11 @@
-// import AppLayout from '../../../../component/Layout';
+import React from 'react';
 
-// import { divide } from "lodash";
+import AppLayout from '../../../component/Layout';
 
-export default function StudentPage() {
-  // return <AppLayout>Welcome Student page</AppLayout>;
-    return <div>About</div>
-  
+export default function CoursesPage() {
+  return (
+    <AppLayout>
+        <div>Welcome Courses page</div>
+    </AppLayout>
+  );
 }

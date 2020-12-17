@@ -1,17 +1,13 @@
 import React from 'react';
 import { Layout, Menu } from 'antd';
-import {
-  UserOutlined,
-  SelectOutlined,
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  LogoutOutlined,
-} from '@ant-design/icons';
+import { MenuUnfoldOutlined, MenuFoldOutlined, LogoutOutlined } from '@ant-design/icons';
 import '../styles/globals.css';
 import Router from 'next/router';
 import styled from 'styled-components';
-import generateKey from '../lib/side-nav'
-import { useUserType } from './login-state';
+import { generateKey } from '../lib/side-nav';
+import { routes } from '../lib/routes';
+import Link from 'next/link';
+import { withRouter } from 'next/router';
 
 const { Header, Content, Sider } = Layout;
 
@@ -20,6 +16,7 @@ class AppLayout extends React.Component {
     super(props);
     this.state = { collapsed: false };
   }
+  renderMenuItems = this.renderMenuItems.bind(this);
 
   onCollapse = (collapsed) => {
     console.log(collapsed);
@@ -44,41 +41,43 @@ class AppLayout extends React.Component {
     });
   };
 
-  renderMenuItems(data, parent = ''){
-    const userType = useUserType()
+  renderMenuItems(data, parent = '') {
+    const userType = this.props.router.pathname.split('/')[2];
 
-    return data.map((item,index) => {
-      const key = generateKey(item,index)
+    return data.map((item, index) => {
+      const key = generateKey(item, index);
 
-      if(item.subNav && item.subNav.length){
+      if (item.subNav && item.subNav.length) {
         return (
-          <Menu.SubMenu key={key} title={item.label} icon ={item.icon}>
+          <Menu.SubMenu key={key} title={item.label} icon={item.icon}>
             {this.renderMenuItems(item.subNav, item.path.join('/'))}
           </Menu.SubMenu>
-        )
-      }else{
-        return(
-          <Menu.Item key={key} title={item.label} icon = {item.icon}>
-           {!!item.path.length || item.label.toLocaleLowerCase() === 'overview' ? (
-             <Link
-              href={['/dashboard', userType, parent, ...item.path]
-                .filter((item) => !!item)
-                .join('/')}
+        );
+      } else {
+        return (
+          <Menu.Item key={key} title={item.label} icon={item.icon}>
+            {!!item.path.length || item.label.toLocaleLowerCase() === 'overview' ? (
+              <Link
+                href={['/dashboard', userType, parent, ...item.path]
+                  .filter((item) => !!item)
+                  .join('/')}
                 replace
-             >
+              >
                 {item.label}
-             </Link>
-           ):(
-             item.label
-           )} 
+              </Link>
+            ) : (
+              item.label
+            )}
           </Menu.Item>
-        )
+        );
       }
-    })
+    });
   }
-
+  userType = this.props.router.pathname.split('/')[2];
+  sideNave = routes.get(this.userType);
   render() {
     const { collapsed } = this.state;
+    const menuItems = this.renderMenuItems(this.sideNave);
 
     return (
       <Layout style={{ minHeight: '100vh' }}>
@@ -99,14 +98,13 @@ class AppLayout extends React.Component {
             CMS
           </div>
 
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-            <Menu.Item key="1" icon={<UserOutlined />} style={{ marginTop: 0 }}>
-              Member List
-            </Menu.Item>
-
-            <Menu.Item key="2" icon={<SelectOutlined />}>
-              Select Member
-            </Menu.Item>
+          <Menu
+            theme="dark"
+            mode="inline"
+            // defaultOpenKeys={defaultOpenKeys}
+            // defaultSelectedKeys={defaultSelectedKeys}
+          >
+            {menuItems}
           </Menu>
         </Sider>
 
@@ -142,4 +140,4 @@ class AppLayout extends React.Component {
   }
 }
 
-export default AppLayout;
+export default withRouter(AppLayout);

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import AppLayout from '../../component/Layout';
+import AppLayout from '../../../../component/Layout';
 
 export default function CoursesPage() {
   return (
