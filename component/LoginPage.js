@@ -4,7 +4,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import Router from 'next/router';
 import styled from 'styled-components';
-import {userType} from './userType'
+import { userType } from './userType';
 
 const StyledButton = styled(Button)`
   &&& {
@@ -16,7 +16,7 @@ class LoginPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loginType: "student",
+      loginType: 'student',
       remember: true,
     };
     this.onFinish = this.onFinish.bind(this);
@@ -24,23 +24,22 @@ class LoginPage extends React.Component {
   }
 
   onFinish = async (values) => {
-    try{
-      const response = await axios
-      .post('/api/login', {
+    try {
+      const response = await axios.post('/api/login', {
         email: values.email,
         password: values.password,
         loginType: values.loginType,
-      })
+      });
       if (response.status === 200) {
         const account = response.data;
         localStorage.setItem('cmsUser', JSON.stringify(account));
 
         Router.push('/dashboard');
       }
-    }catch(error){
-      console.log(error)
+    } catch (error) {
+      console.log(error);
       message.error('Login failed! Please check you email and password!');
-    }       
+    }
   };
 
   onFinishFailed = (errorInfo) => {
@@ -53,7 +52,7 @@ class LoginPage extends React.Component {
     return (
       <>
         <Row justify="center" style={{ marginTop: '5%' }}>
-          <Col span={6}>
+          <Col span={12}>
             <Form
               name="basic"
               initialValues={{
@@ -66,18 +65,20 @@ class LoginPage extends React.Component {
 
               <Form.Item
                 name="loginType"
-                initialValue = "student"
+                initialValue="student"
                 rules={[
                   {
                     required: true,
                     message: 'Please select login type',
                   },
-                ]}>
-
+                ]}
+              >
                 <Radio.Group
                   value={loginType}
                   onChange={(e) => {
-                    this.setState({ loginType: e.target.value });}}>
+                    this.setState({ loginType: e.target.value });
+                  }}
+                >
                   <Radio.Button value={userType.student}>Student</Radio.Button>
                   <Radio.Button value={userType.teacher}>Teacher</Radio.Button>
                   <Radio.Button value={userType.manager}>Manager</Radio.Button>
@@ -128,7 +129,6 @@ class LoginPage extends React.Component {
                   Login
                 </StyledButton>
               </Form.Item>
-              
             </Form>
           </Col>
         </Row>

@@ -130,7 +130,6 @@ const TableInfo = () => {
     );
 
     await studentApi(req).then((res) => {
-      console.log(studentInfo);
       const { studentInfo, total } = res.data.data;
       setStudentData(studentInfo);
       setTotal(total);
