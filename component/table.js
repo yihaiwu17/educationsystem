@@ -7,6 +7,7 @@ import { formatDistanceToNow } from 'date-fns';
 import ModalForm from '../component/modalForm';
 import AddStudentForm from '../component/AddStudentForm';
 import { PlusOutlined } from '@ant-design/icons';
+import Link from 'next/link'
 
 const Search = styled(Input.Search)`
   width: 30%;
@@ -39,6 +40,9 @@ const TableInfo = () => {
       title: 'Name',
       dataIndex: 'name',
       sorter: (a, b) => a['name'].localeCompare(b['name']),
+      render: (_, record) => (
+        <Link href={`/dashboard/manager/students/${record.id}`}>{record.name}</Link>
+      ),
     },
     {
       title: 'Area',

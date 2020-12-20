@@ -4,25 +4,20 @@ import { MenuUnfoldOutlined, MenuFoldOutlined, LogoutOutlined } from '@ant-desig
 import '../styles/globals.css';
 import Router from 'next/router';
 import styled from 'styled-components';
-import { generateKey,omitDetailPath,generateFactory,generatePath } from '../lib/side-nav';
+import { generateKey, omitDetailPath, generateFactory, generatePath } from '../lib/side-nav';
 import { routes } from '../lib/routes';
 import Link from 'next/link';
 import { withRouter } from 'next/router';
 import { memoize } from 'lodash';
+import AppBreadcrumb from '../lib/breadcrumb';
 
 const { Header, Content, Sider } = Layout;
 
 class AppLayout extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { collapsed: false
-      // defaultOpenKeys:[],
-      // defaultSelectedKeys:[]
-    };
+    this.state = { collapsed: false };
     this.renderMenuItems = this.renderMenuItems.bind(this);
-    // this.getMenuConfig = this.getMenuConfig.bind(this)
-    // this.getActiveKey = this.getActiveKey.bind(this)
-
   }
 
   onCollapse = (collapsed) => {
@@ -81,51 +76,71 @@ class AppLayout extends React.Component {
     });
   }
 
-  getMenuConfig=(data)=> {
-    // const data = this.sideNave
-    const key = this.getActiveKey(data)
-    console.log(key)
+  getMenuConfig = (data) => {
+    const key = this.getActiveKey(data);
+    console.log(key);
     const defaultSelectedKeys = [key.split('/').pop()];
     const defaultOpenKeys = key.split('/').slice(0, -1);
 
-    return { defaultSelectedKeys, defaultOpenKeys }; 
-  }
+    return { defaultSelectedKeys, defaultOpenKeys };
+  };
 
   getActiveKey = (data) => {
     const activeRoute = omitDetailPath(this.pathname);
     const { paths, keys } = this.memoizedGetKeyPathInfo(data);
     const index = paths.findIndex((item) => item === activeRoute);
-  
+
     return keys[index] || '';
   };
 
-
   getKeyPathInfo = (data) => {
     const getPaths = generateFactory(generatePath);
-    const userType = this.userType
+    const userType = this.userType;
     const paths = getPaths(data)
       .reduce((acc, cur) => [...acc, ...cur], [])
       .map((item) => ['/dashboard', userType, item].filter((item) => !!item).join('/'));
     const getKeys = generateFactory(generateKey);
     const keys = getKeys(data).reduce((acc, cur) => [...acc, ...cur], []);
-  
+
     return { keys, paths };
   };
-  
+
   memoizedGetKeyPathInfo = memoize(this.getKeyPathInfo, (data) =>
     data.map((item) => item.label).join('_')
   );
-  
-  
-  pathname = this.props.router.pathname
+
+  getSideNavNameByPath = (data, path) => {
+    if (this.isDetailPath(path)) {
+      return ['Detail'];
+    }
+    const { paths, keys } = this.memoizedGetKeyPathInfo(data);
+    console.log('11');
+    const index = paths.findIndex((item) => item === path);
+
+    return this.getSideNavNameByKey(keys[index]);
+  };
+
+  getSideNavNameByKey = (key) => {
+    return key.split('/').map((item) => item.split('_')[0]);
+  };
+
+  isDetailPath = (path) => {
+    const paths = path.split('/');
+    const length = paths.length;
+    const last = paths[length - 1];
+    const reg = /\[.*\]/;
+
+    return reg.test(last);
+  };
+
+  pathname = this.props.router.pathname;
   userType = this.props.router.pathname.split('/')[2];
   sideNave = routes.get(this.userType);
-
 
   render() {
     const { collapsed } = this.state;
     const menuItems = this.renderMenuItems(this.sideNave);
-    const {defaultOpenKeys,defaultSelectedKeys} = this.getMenuConfig(this.sideNave)
+    const { defaultOpenKeys, defaultSelectedKeys } = this.getMenuConfig(this.sideNave);
 
     return (
       <Layout style={{ minHeight: '100vh' }}>
@@ -180,6 +195,7 @@ class AppLayout extends React.Component {
           <Content
             style={{ background: '#fff', margin: '15px', padding: '15px', minHeight: 'auto' }}
           >
+            <AppBreadcrumb getSideNavNameByPath={this.getSideNavNameByPath}></AppBreadcrumb>
             {this.props.children}
           </Content>
         </Layout>
