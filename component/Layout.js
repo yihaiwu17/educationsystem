@@ -78,7 +78,6 @@ class AppLayout extends React.Component {
 
   getMenuConfig = (data) => {
     const key = this.getActiveKey(data);
-    console.log(key);
     const defaultSelectedKeys = [key.split('/').pop()];
     const defaultOpenKeys = key.split('/').slice(0, -1);
 
@@ -114,7 +113,6 @@ class AppLayout extends React.Component {
       return ['Detail'];
     }
     const { paths, keys } = this.memoizedGetKeyPathInfo(data);
-    console.log('11');
     const index = paths.findIndex((item) => item === path);
 
     return this.getSideNavNameByKey(keys[index]);

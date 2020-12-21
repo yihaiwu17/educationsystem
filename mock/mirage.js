@@ -7,6 +7,7 @@ const courseTypes = require('../mock/data/course_type.json');
 const courses = require('../mock/data/course.json');
 const studentCourses = require('../mock/data/student_course.json');
 const studentTypes = require('../mock/data/student_type.json');
+const studentProfiles = require('../mock/data/student_profile.json');
 
 export function makeServer({ environment = 'test' } = {}) {
   let server = createServer({
@@ -20,9 +21,15 @@ export function makeServer({ environment = 'test' } = {}) {
         type: belongsTo('studentType'),
       }),
       courseType: Model,
-      course: Model,
+      course: Model.extend({
+        type: belongsTo('courseType'),
+      }),
       studentCourse: Model.extend({
         course: belongsTo(),
+      }),
+      studentProfile: Model.extend({
+        studentCourses: hasMany(),
+        type: belongsTo('studentType'),
       }),
     },
 
@@ -33,6 +40,7 @@ export function makeServer({ environment = 'test' } = {}) {
       studentCourses.forEach((course) => server.create('studentCourse', course));
       studentTypes.forEach((type) => server.create('studentType', type));
       students.forEach((student) => server.create('student', student));
+      studentProfiles.forEach((profile) => server.create('studentProfile', profile));
     },
 
     routes() {
@@ -85,6 +93,37 @@ export function makeServer({ environment = 'test' } = {}) {
             },
           }
         );
+      });
+
+      this.get('/student', (schema, request) => {
+        const id = request.queryParams.id;
+        const student = schema.studentProfiles.findBy({ id });
+        const studentCourses = student.studentCourses;
+        let courses = [];
+
+        if (studentCourses.length) {
+          studentCourses.models.map((item) => {
+            const name = item.course.name;
+            const type = item.course.type.name;
+            courses.push({ name, type });
+          });
+        }
+        student.attrs.courses = courses;
+        student.attrs.typeName = student.type.name;
+
+        if (student) {
+          return new Response(
+            200,
+            {},
+            {
+              code: 0,
+              msg: 'success',
+              data: {
+                student,
+              },
+            }
+          );
+        }
       });
 
       this.post(firstPaths.students + '/' + secondPaths.add, (schema, req) => {

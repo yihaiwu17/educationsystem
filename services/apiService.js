@@ -41,3 +41,10 @@ export const updateStudentApi = async (params) => {
   return res;
 };
 
+export const studentDetailApi = async (id) => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.student,{id}))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};

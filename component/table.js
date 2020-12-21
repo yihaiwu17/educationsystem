@@ -41,7 +41,7 @@ const TableInfo = () => {
       dataIndex: 'name',
       sorter: (a, b) => a['name'].localeCompare(b['name']),
       render: (_, record) => (
-        <Link href={`/dashboard/manager/students/${record.id}`}>{record.name}</Link>
+        <Link href={{pathname:`/dashboard/manager/students/[id]`,query:{id:`${record.id}`}}}>{record.name}</Link>
       ),
     },
     {
