@@ -105,7 +105,8 @@ export function makeServer({ environment = 'test' } = {}) {
           studentCourses.models.map((item) => {
             const name = item.course.name;
             const type = item.course.type.name;
-            courses.push({ name, type });
+            const ctime = item.course.ctime
+            courses.push({ name, type,ctime });
           });
         }
         student.attrs.courses = courses;
