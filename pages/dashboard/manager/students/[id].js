@@ -6,6 +6,7 @@ import { studentDetailApi } from '../../../../services/apiService';
 import styled from 'styled-components';
 
 const H3 = styled.h3`
+  margin: 20px 0px;
   font-size: 24px;
   color: #9932cc;
 `;
@@ -25,6 +26,15 @@ const columnData = [
   },
 ];
 
+export async function getServerSideProps(context){
+  const {id} = context.params
+
+  return{
+    props:{id}
+  }
+}
+
+
 export default function StudentDetail() {
   const router = useRouter();
   const [info, setInfo] = useState([]);
@@ -37,7 +47,7 @@ export default function StudentDetail() {
   const { TabPane } = Tabs;
 
   useEffect(async () => {
-    const id = router.query.id;
+    const id = router.query.id || props.id;
     const detail = await studentDetailApi(id);
     const info = [
       { label: 'Name', value: detail.data.data.student.name },
@@ -71,7 +81,7 @@ export default function StudentDetail() {
 
   return (
     <AppLayout>
-      <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+      <Row gutter={[6,16]}>
         <Col span={8}>
           <Card
             title={
@@ -100,23 +110,22 @@ export default function StudentDetail() {
         <Col offset={1} span={15}>
           <Card>
             <Tabs defaultActiveKey="1">
-              <TabPane tab="About" key="1">
+              <Tabs.TabPane tab="About" key="1">
                 <H3>Information</H3>
-                <Row>
-                  {aboutDetail.map((item) => {
-                    return (
+                <Row gutter={[6, 16]}>
+                  {aboutDetail.map((item) => (
                       <Col span={24} key={item.label}>
-                        <b style={{ display: 'inline', marginRight: 24 }}>{item.label}</b>
+                        <b style={{ display: 'inline-block', marginRight: 16,minWidth:150 }}>{item.label}</b>
                         <span>{item.value}</span>
                       </Col>
-                    );
-                  })}
+                    )
+                  )}
                 </Row>
                 <H3>Interesting</H3>
                 <Row>
                   {insDetail.map((item, index) => {
                     return (
-                      <Tag key={index + item} color={tagColor[index]}>
+                      <Tag key={index + item} color={tagColor[index]} style={{ padding: '5px 10px' }}>
                         {item}
                       </Tag>
                     );
@@ -124,8 +133,11 @@ export default function StudentDetail() {
                 </Row>
 
                 <H3>Description</H3>
-                <p>{description}</p>
-              </TabPane>
+                <Row gutter={[6, 16]}>
+                  <Col style={{ lineHeight: 2 }}>{description}</Col>
+                </Row>
+
+              </Tabs.TabPane>
 
               <TabPane tab="Courses" key="2">
                 <Table columns={columnData} dataSource={course} />
