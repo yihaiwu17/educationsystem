@@ -48,3 +48,11 @@ export const studentDetailApi = async (id) => {
     .catch((err) => errorHandler(err));
   return res;
 };
+
+export const coursesDetailApi = async (params) => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.courses,params))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};

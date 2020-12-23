@@ -3,7 +3,8 @@ export const firstPaths = {
   logout: 'logout',
   students: 'students',
   users: 'users',
-  student:'student'
+  student:'student',
+  courses:'courses'
 };
 
 export const secondPaths = {

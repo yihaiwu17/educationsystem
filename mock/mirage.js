@@ -3,6 +3,7 @@ import { belongsTo, createServer, hasMany, Model, Response } from 'miragejs';
 import { firstPaths, secondPaths } from '../services/path';
 const students = require('../mock/data/student.json');
 const users = require('../mock/data/user.json');
+const teachers = require('../mock/data/teacher.json');
 const courseTypes = require('../mock/data/course_type.json');
 const courses = require('../mock/data/course.json');
 const studentCourses = require('../mock/data/student_course.json');
@@ -21,7 +22,9 @@ export function makeServer({ environment = 'test' } = {}) {
         type: belongsTo('studentType'),
       }),
       courseType: Model,
+      teacher: Model,
       course: Model.extend({
+        teacher: belongsTo('teacher'),
         type: belongsTo('courseType'),
       }),
       studentCourse: Model.extend({
@@ -36,6 +39,7 @@ export function makeServer({ environment = 'test' } = {}) {
     seeds(server) {
       users.forEach((user) => server.create('user', user));
       courseTypes.forEach((type) => server.create('courseType', type));
+      teachers.forEach((teacher) => server.create('teacher', teacher));
       courses.forEach((course) => server.create('course', course));
       studentCourses.forEach((course) => server.create('studentCourse', course));
       studentTypes.forEach((type) => server.create('studentType', type));
@@ -49,6 +53,39 @@ export function makeServer({ environment = 'test' } = {}) {
       });
 
       this.namespace = 'api';
+
+      this.get('/courses', (schema, request) => {
+        const limit = request.queryParams.limit;
+        const page = request.queryParams.page;
+        let courses = schema.courses.all().models;
+        const total = courses.length;
+
+        if (limit && page) {
+          const start = limit * (page - 1);
+          const next = limit * page;
+          courses = courses.slice(start, next);
+        }
+
+        courses.forEach((item) => {
+          item.attrs.teacherName = item.teacher.name;
+          item.attrs.typeName = item.type.name;
+        });
+
+        if (courses) {
+          return new Response(
+            200,
+            {},
+            {
+              code: 0,
+              msg: 'success',
+              data: {
+                courses,
+                total,
+              },
+            }
+          );
+        }
+      });
 
       this.get('/students', (schema, request) => {
         const limit = request.queryParams.limit;
@@ -105,8 +142,8 @@ export function makeServer({ environment = 'test' } = {}) {
           studentCourses.models.map((item) => {
             const name = item.course.name;
             const type = item.course.type.name;
-            const ctime = item.course.ctime
-            courses.push({ name, type,ctime });
+            const ctime = item.course.ctime;
+            courses.push({ name, type, ctime });
           });
         }
         student.attrs.courses = courses;
