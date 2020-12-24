@@ -3,7 +3,6 @@ import { Layout, Menu } from 'antd';
 import { MenuUnfoldOutlined, MenuFoldOutlined, LogoutOutlined } from '@ant-design/icons';
 import '../styles/globals.css';
 import Router from 'next/router';
-import styled from 'styled-components';
 import { generateKey, omitDetailPath, generateFactory, generatePath } from '../lib/side-nav';
 import { routes } from '../lib/routes';
 import Link from 'next/link';
@@ -169,7 +168,7 @@ class AppLayout extends React.Component {
           </Menu>
         </Sider>
 
-        <Layout className="site-layout">
+        <Layout id="contentLayout">
           <Header
             className="site-layout-background"
             style={{
