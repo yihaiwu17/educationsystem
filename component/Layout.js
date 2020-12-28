@@ -20,7 +20,6 @@ class AppLayout extends React.Component {
   }
 
   onCollapse = (collapsed) => {
-    console.log(collapsed);
     this.setState({ collapsed });
   };
 
@@ -140,7 +139,7 @@ class AppLayout extends React.Component {
     const { defaultOpenKeys, defaultSelectedKeys } = this.getMenuConfig(this.sideNave);
 
     return (
-      <Layout style={{ minHeight: '100vh' }}>
+      <Layout style={{height: '100vh' }}>
         <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse}>
           <div
             style={{
@@ -178,6 +177,9 @@ class AppLayout extends React.Component {
               color: 'white',
               fontSize: '20px',
               alignItems: 'center',
+              position: 'sticky',
+              top: 0,
+              zIndex: 10,
             }}
           >
             <div onClick={this.toggle} style={{ margin: '25px', cursor: 'pointer' }}>

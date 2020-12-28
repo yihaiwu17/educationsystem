@@ -22,9 +22,9 @@ export function makeServer({ environment = 'test' } = {}) {
         type: belongsTo('studentType'),
       }),
       courseType: Model,
-      teacher: Model,
+      
       course: Model.extend({
-        teacher: belongsTo('teacher'),
+        teacher: belongsTo(),
         type: belongsTo('courseType'),
       }),
       studentCourse: Model.extend({
@@ -34,6 +34,7 @@ export function makeServer({ environment = 'test' } = {}) {
         studentCourses: hasMany(),
         type: belongsTo('studentType'),
       }),
+      teacher: Model,
     },
 
     seeds(server) {

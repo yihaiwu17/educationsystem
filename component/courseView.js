@@ -1,43 +1,72 @@
 import { Card, Row, Col } from 'antd';
 import { HeartFilled, UserOutlined } from '@ant-design/icons';
+import styled from 'styled-components';
 
-export default function CourseView({ value }) {
+const StyledRow = styled(Row)`
+  position: relative;
+  :after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    background: #ccc;
+    width: 100%;
+    height: 1px;
+  }
+`;
+
+const durUnit = [
+  'year','month','day','week','hour'
+]
+
+const getDuration =(data)=>{
+  const {duration,durationUnit} = data
+  const text = `${duration} ${durUnit[durationUnit]}`
+
+  return duration >1 ? text+'s':text
+}
+
+export default function CourseView(props) {
+  const gutter= [6, 16];
   return (
-    <Card cover={<img alt="coursePng" src={value.cover} />}>
-      <Row>
+    <Card cover={<img alt="coursePng" src={props.cover} />}>
+      <Row gutter={gutter}>
         <h3>
-          <b>{value.name}</b>
+          <b>{props.name}</b>
         </h3>
       </Row>
 
-      <Row justify="space-between">
-        <Col>{value.startTime}</Col>
-        <Col>
-          <HeartFilled style={{ color: 'red' }} />
-          <b>{value.star}</b>
+      <StyledRow gutter={gutter} justify="space-between" align="middle">
+        <Col>{props.startTime}</Col>
+        <Col style={{ display: 'flex', alignItems: 'center' }}>
+          <HeartFilled style={{ marginRight: 5, fontSize: 16, color: 'red' }} />
+          <b>{props.star}</b>
         </Col>
-      </Row>
+      </StyledRow>
 
-      <Row justify="space-between">
+      <StyledRow gutter={gutter} justify="space-between">
         <Col>Duration:</Col>
-      </Row>
+        <Col>
+        <b>{getDuration(props)}</b>
+        </Col>
+      </StyledRow>
 
-      <Row justify="space-between">
+      <StyledRow  gutter={gutter} justify="space-between">
         <Col>Teacher:</Col>
         <Col>
-          <b>{value.teacher}</b>
+          <b>{props.teacherName}</b>
         </Col>
-      </Row>
+      </StyledRow>
 
-      <Row justify="space-between">
+      <Row gutter={gutter} justify="space-between">
         <Col>
-          <UserOutlined />
+          <UserOutlined style={{ marginRight: 5, fontSize: 16, color: "#1890ff" }}/>
           <span>Student Amount:</span>
         </Col>
         <Col>
-          <b>{value.maxStudents}</b>
+          <b>{props.maxStudents}</b>
         </Col>
       </Row>
+      {props.children}
     </Card>
   );
 }
