@@ -9,6 +9,8 @@ const courses = require('../mock/data/course.json');
 const studentCourses = require('../mock/data/student_course.json');
 const studentTypes = require('../mock/data/student_type.json');
 const studentProfiles = require('../mock/data/student_profile.json');
+const sales = require('../mock/data/sales.json')
+const schedules = require('../mock/data/schedule.json')
 
 export function makeServer({ environment = 'test' } = {}) {
   let server = createServer({
@@ -22,10 +24,14 @@ export function makeServer({ environment = 'test' } = {}) {
         type: belongsTo('studentType'),
       }),
       courseType: Model,
-      
+      teacher: Model,
+      sale: Model,
+      schedule: Model,
       course: Model.extend({
         teacher: belongsTo(),
         type: belongsTo('courseType'),
+        sale: belongsTo(),
+        schedule:belongsTo(),
       }),
       studentCourse: Model.extend({
         course: belongsTo(),
@@ -34,13 +40,15 @@ export function makeServer({ environment = 'test' } = {}) {
         studentCourses: hasMany(),
         type: belongsTo('studentType'),
       }),
-      teacher: Model,
+
     },
 
     seeds(server) {
       users.forEach((user) => server.create('user', user));
       courseTypes.forEach((type) => server.create('courseType', type));
       teachers.forEach((teacher) => server.create('teacher', teacher));
+      sales.forEach((sale) => server.create('sale', sale));
+      schedules.forEach((schedule) => server.create('schedule', schedule));
       courses.forEach((course) => server.create('course', course));
       studentCourses.forEach((course) => server.create('studentCourse', course));
       studentTypes.forEach((type) => server.create('studentType', type));
