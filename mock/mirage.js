@@ -67,9 +67,10 @@ export function makeServer({ environment = 'test' } = {}) {
         const id = request.queryParams.id; 
         let courseData = schema.courses.findBy({ id });
         courseData.attrs.sales = courseData.sales.attrs
-        courseData.attrs.schedules = courseData.schedule.attrs
-
-        if (course) {
+        courseData.attrs.teacherName = courseData.teacher.name
+        let schedules = courseData.schedule.attrs
+      
+        if (courseData) {
           return new Response(
             200,
             {},
@@ -77,12 +78,11 @@ export function makeServer({ environment = 'test' } = {}) {
               code: 0,
               msg: 'success',
               data: {
-                course,
-                total,
+                courseData
               },
-              // process:{
-
-              // }
+              process:{
+                schedules
+              }
             }
           );
         }
