@@ -4,7 +4,8 @@ export const firstPaths = {
   students: 'students',
   users: 'users',
   student:'student',
-  courses:'courses'
+  courses:'courses',
+  course:'course'
 };
 
 export const secondPaths = {

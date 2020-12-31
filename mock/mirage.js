@@ -28,13 +28,13 @@ export function makeServer({ environment = 'test' } = {}) {
       sale: Model,
       schedule: Model,
       course: Model.extend({
-        teacher: belongsTo(),
+        teacher: belongsTo('teacher'),
         type: belongsTo('courseType'),
-        sale: belongsTo(),
-        schedule:belongsTo(),
+        sales: belongsTo('sale'),
+        schedule:belongsTo('schedule'),
       }),
       studentCourse: Model.extend({
-        course: belongsTo(),
+        course: belongsTo('course'),
       }),
       studentProfile: Model.extend({
         studentCourses: hasMany(),
@@ -62,6 +62,31 @@ export function makeServer({ environment = 'test' } = {}) {
       });
 
       this.namespace = 'api';
+
+      this.get('/course', (schema, request) => {
+        const id = request.queryParams.id; 
+        let courseData = schema.courses.findBy({ id });
+        courseData.attrs.sales = courseData.sales.attrs
+        courseData.attrs.schedules = courseData.schedule.attrs
+
+        if (course) {
+          return new Response(
+            200,
+            {},
+            {
+              code: 0,
+              msg: 'success',
+              data: {
+                course,
+                total,
+              },
+              // process:{
+
+              // }
+            }
+          );
+        }
+      });
 
       this.get('/courses', (schema, request) => {
         const limit = request.queryParams.limit;
@@ -117,7 +142,6 @@ export function makeServer({ environment = 'test' } = {}) {
           if (studentCourses.length) {
             courses = studentCourses.models.map((model) => {
               const name = model.course.name;
-
               return { name, id: model.id };
             });
           }

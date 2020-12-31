@@ -4,7 +4,8 @@ import { List, Spin, Button } from 'antd';
 import CourseView from '../../../../component/courseView';
 import AppLayout from '../../../../component/Layout';
 import { coursesDetailApi } from '../../../../services/apiService';
-import BackToTop from '../../../../component/backToTop'
+import BackToTop from '../../../../component/backToTop';
+import Link from 'next/link';
 
 export default function CoursesPage() {
   const [courseInfo, setCourseInfo] = useState([]);
@@ -56,7 +57,9 @@ export default function CoursesPage() {
           renderItem={(item) => (
             <List.Item key={item.id}>
               <CourseView {...item}>
-                <Button type="primary">Read More</Button>
+                <Link href={`/dashboard/manager/courses/${item.id}`} passHref>
+                  <Button type="primary">Read More</Button>
+                </Link>
               </CourseView>
             </List.Item>
           )}
