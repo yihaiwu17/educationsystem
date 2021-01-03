@@ -96,10 +96,10 @@ export default function CourseDetail() {
     <AppLayout>
       <Row gutter={[6, 16]}>
         <Col span={8}>
-          <CourseView {...info} cardProps={{ bodyStyle: { paddingBottom: 0 } }}>
+          <CourseView {...info}>
             <StyleRow gutter={[6, 16]} align="middle" justify="space-between">
               {saleDetail.map((item) => (
-                <StyleCol key={item.label} span="6">
+                <StyleCol key={item.label} span="6" >
                   <b>{item.value}</b>
                   <p>{item.label}</p>
                 </StyleCol>
@@ -115,7 +115,7 @@ export default function CourseDetail() {
             <Row>{info.ctime}</Row>
             <h3>Start Time</h3>
             <Row>{info.startTime}</Row>
-            <Badge status={CourseStatus[info.status]} offset={[5,24]}>
+            <Badge status={CourseStatus[info.status]} offset={[10,10]}>
               <h3>Status</h3>
             </Badge>
             <Row>
