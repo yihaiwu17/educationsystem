@@ -37,7 +37,7 @@ class LoginPage extends React.Component {
         Router.push('/dashboard');
       }
     } catch (error) {
-      console.log(error);
+
       message.error('Login failed! Please check you email and password!');
     }
   };

@@ -68,6 +68,7 @@ export function makeServer({ environment = 'test' } = {}) {
         let courseData = schema.courses.findBy({ id });
         courseData.attrs.sales = courseData.sales.attrs
         courseData.attrs.teacherName = courseData.teacher.name
+        courseData.attrs.typeName = courseData.type.name
         let schedules = courseData.schedule.attrs
       
         if (courseData) {
