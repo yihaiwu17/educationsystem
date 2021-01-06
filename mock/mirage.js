@@ -63,6 +63,11 @@ export function makeServer({ environment = 'test' } = {}) {
 
       this.namespace = 'api';
 
+      this.get('/teachers',(schema,request) => {
+        const {query} = request.queryParams
+        console.log(schema)
+      })
+
       this.get('/course', (schema, request) => {
         const id = request.queryParams.id; 
         let courseData = schema.courses.findBy({ id });
@@ -130,7 +135,7 @@ export function makeServer({ environment = 'test' } = {}) {
         let studentInfo = all.filter((item) => !query || item.name.includes(query)).models;
         const total = !query ? all.length : studentInfo.length;
         let data = { total, studentInfo };
-        if (limit && page) {
+        if (limit && page) { 
           const start = limit * (page - 1);
           studentInfo = studentInfo.slice(start, start + limit);
           data = { ...data, paginator: { limit, page, total } };

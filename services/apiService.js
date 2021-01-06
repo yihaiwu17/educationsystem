@@ -1,4 +1,3 @@
-import React from 'react';
 import axios from 'axios';
 import { firstPaths, secondPaths, createUrl } from './path';
 import errorHandler from './errorCall';
@@ -60,6 +59,14 @@ export const coursesDetailApi = async (params) => {
 export const courseDetailApi = async (id) => {
   const res = await axiosApi
     .get(createUrl(firstPaths.course,{id}))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
+export const teachersApi = async (params) => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.teachers,params))
     .then((res) => res)
     .catch((err) => errorHandler(err));
   return res;

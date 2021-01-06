@@ -28,7 +28,7 @@ const getDuration =(data)=>{
 export default function CourseView(props) {
   const gutter= [6, 16];
   return (
-    <Card cover={<img alt="coursePng" src={props.cover} />}>
+    <Card cover={<img alt="coursePng" src={props.cover} /> } bodyStyle={props.bodyStyle}>
       <Row gutter={gutter}>
         <h3>
           <b>{props.name}</b>

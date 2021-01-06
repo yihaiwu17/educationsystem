@@ -5,7 +5,8 @@ export const firstPaths = {
   users: 'users',
   student:'student',
   courses:'courses',
-  course:'course'
+  course:'course',
+  teachers:'teachers'
 };
 
 export const secondPaths = {

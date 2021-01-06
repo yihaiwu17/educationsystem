@@ -3,8 +3,13 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import CourseView from '../../../../component/courseView';
 import AppLayout from '../../../../component/Layout';
-import { Row, Col, Card, Badge,Steps,Tag,Collapse   } from 'antd';
+import { Row, Col, Card, Badge, Steps, Tag, Collapse } from 'antd';
 import styled from 'styled-components';
+import WeekdaysTable from '../../../../component/calendar';
+
+const H3 = styled.h3`
+  margin: 1em 0;
+`;
 
 const H2 = styled.h2`
   color: #7356f1;
@@ -38,17 +43,17 @@ const StyleCol = styled(Col)`
 
 const CourseStatus = ['warning', 'success', 'default'];
 
-const chapterExtra=(currentOpen,currentStep,index)=>{
-  const activeIndex = currentStep.findIndex((item)=> item.id === currentOpen)
+const chapterExtra = (currentSchedules, currentStep, index) => {
+  const activeIndex = currentStep.findIndex((item) => item.id === currentSchedules.current);
 
-  if(index === activeIndex){
-    return(<Tag color={'green'}>进行中</Tag>)
-  }else if(index <activeIndex){
-    return(<Tag color={'default'}>已完成</Tag>)
-  }else{
-    return(<Tag color={'orange'}>未开始</Tag>)
+  if (index === activeIndex) {
+    return <Tag color={'green'}>进行中</Tag>;
+  } else if (index < activeIndex) {
+    return <Tag color={'default'}>已完成</Tag>;
+  } else {
+    return <Tag color={'orange'}>未开始</Tag>;
   }
-}
+};
 
 export async function getServerSideProps(context) {
   const { id } = context.params;
@@ -62,9 +67,9 @@ export default function CourseDetail() {
   const router = useRouter();
   const [info, setInfo] = useState([]);
   const [saleDetail, setSaleDetail] = useState([]);
-  const [currentStep,setCurrentStep] = useState([]);
-  const [currentOpen,setCurrentOpen] = useState();
-  const [activeChapterIndex,setActiveChapterIndex] = useState(0);
+  const [currentStep, setCurrentStep] = useState([]);
+  const [currentSchedules, setCurrentSchedules] = useState();
+  const [activeChapterIndex, setActiveChapterIndex] = useState(0);
 
   useEffect(async () => {
     const id = router.query.id || props.id;
@@ -72,8 +77,8 @@ export default function CourseDetail() {
     console.log(courseDetail);
     const info = courseDetail.data.data.courseData;
     const saleInfo = courseDetail.data.data.courseData.sales;
-    const currentOpen =courseDetail.data.process.schedules.current;
-    const currentStep = courseDetail.data.process.schedules.chapters
+    const currentSchedules = courseDetail.data.process.schedules;
+    const currentStep = courseDetail.data.process.schedules.chapters;
     const saleDetail = [
       { label: 'Price', value: saleInfo.price },
       { label: 'Batch', value: saleInfo.batches },
@@ -82,24 +87,25 @@ export default function CourseDetail() {
     ];
     setSaleDetail(saleDetail);
     setInfo(info);
-    setCurrentOpen(currentOpen)
+    setCurrentSchedules(currentSchedules);
     setActiveChapterIndex(
-      courseDetail.data.process.schedules.chapters.findIndex((item)=> 
-        item.id === courseDetail.data.process.schedules.current
+      courseDetail.data.process.schedules.chapters.findIndex(
+        (item) => item.id === courseDetail.data.process.schedules.current
       )
     );
-    setCurrentStep(currentStep)
-    console.log(currentOpen)
+    setCurrentStep(currentStep);
+    console.log(currentSchedules);
+    console.log(currentSchedules.classTime);
   }, []);
 
   return (
     <AppLayout>
       <Row gutter={[6, 16]}>
         <Col span={8}>
-          <CourseView {...info}>
+          <CourseView {...info} bodyStyle={{ paddingBottom: 0 }}>
             <StyleRow gutter={[6, 16]} align="middle" justify="space-between">
               {saleDetail.map((item) => (
-                <StyleCol key={item.label} span="6" >
+                <StyleCol key={item.label} span="6">
                   <b>{item.value}</b>
                   <p>{item.label}</p>
                 </StyleCol>
@@ -111,47 +117,61 @@ export default function CourseDetail() {
         <Col offset={1} span={15}>
           <Card>
             <H2>Course Detail</H2>
-            <h3 margin="1em 0">Create Time</h3>
+            <H3 margin="1em 0">Create Time</H3>
             <Row>{info.ctime}</Row>
-            <h3>Start Time</h3>
+            <H3>Start Time</H3>
             <Row>{info.startTime}</Row>
-            <Badge status={CourseStatus[info.status]} offset={[10,10]}>
-              <h3>Status</h3>
-            </Badge>
-            <Row>
-              <Steps size="small" current={activeChapterIndex}>
-                {currentStep.map((item) => (
-                  <Steps.Step title={item.name} key={item.id}></Steps.Step>
-                ))}
-              </Steps>
-            </Row>
-            <h3>Course Code</h3>
+            <H3>
+              <Badge status={CourseStatus[info.status]} offset={[10, 10]}>
+                <h3>Status</h3>
+              </Badge>
+            </H3>
+            <H3>
+              <Row>
+                <Steps size="small" current={activeChapterIndex}>
+                  {currentStep.map((item) => (
+                    <Steps.Step title={item.name} key={item.id}></Steps.Step>
+                  ))}
+                </Steps>
+              </Row>
+            </H3>
+            <H3>Course Code</H3>
             <Row>{info.uid}</Row>
 
-            <h3>Class Time</h3>
+            <H3>Class Time</H3>
 
-            <h3>Category</h3>
+            {currentSchedules && <WeekdaysTable data={currentSchedules.classTime}></WeekdaysTable>}
+            <H3>Category</H3>
             <Row>
               <Tag color={'geekblue'}> {info.typeName}</Tag>
             </Row>
 
-            <h3>Description</h3>
-            {info.detail !=='no' ? (
+            <H3>Description</H3>
+            {info.detail !== 'no' ? (
               <Row> {info.detail}</Row>
-            ):(
+            ) : (
               <Row>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Pariatur, voluptatem velit reprehenderit sequi, nam, corrupti eum natus exercitationem est illum quibusdam placeat excepturi aperiam accusantium voluptatibus incidunt assumenda iure at!
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Pariatur, voluptatem velit
+                reprehenderit sequi, nam, corrupti eum natus exercitationem est illum quibusdam
+                placeat excepturi aperiam accusantium voluptatibus incidunt assumenda iure at!
               </Row>
             )}
 
-            <h3>Chapter</h3>
-            <Collapse defaultActiveKey={currentOpen}>
-              {currentStep.map((item,index)=>(
-                <Collapse.Panel header={item.name} key={item.id} extra={chapterExtra(currentOpen,currentStep,index)}>
-                <p>{item.content}</p>
-                </Collapse.Panel>
-              ))}
-            </Collapse> 
+            <H3>Chapter</H3>
+
+            {currentSchedules && (
+              <Collapse defaultActiveKey={currentSchedules.current}>
+                {currentStep.map((item, index) => (
+                  <Collapse.Panel
+                    header={item.name}
+                    key={item.id}
+                    extra={chapterExtra(currentSchedules, currentStep, index)}
+                  >
+                    <p>{item.content}</p>
+                  </Collapse.Panel>
+                ))}
+              </Collapse>
+            )}
           </Card>
         </Col>
       </Row>
