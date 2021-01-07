@@ -71,3 +71,11 @@ export const teachersApi = async (params) => {
     .catch((err) => errorHandler(err));
   return res;
 };
+
+export const courseTypeApi = async () => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.course+"/"+secondPaths.type))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};

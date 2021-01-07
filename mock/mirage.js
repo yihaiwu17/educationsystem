@@ -9,8 +9,8 @@ const courses = require('../mock/data/course.json');
 const studentCourses = require('../mock/data/student_course.json');
 const studentTypes = require('../mock/data/student_type.json');
 const studentProfiles = require('../mock/data/student_profile.json');
-const sales = require('../mock/data/sales.json')
-const schedules = require('../mock/data/schedule.json')
+const sales = require('../mock/data/sales.json');
+const schedules = require('../mock/data/schedule.json');
 
 export function makeServer({ environment = 'test' } = {}) {
   let server = createServer({
@@ -31,7 +31,7 @@ export function makeServer({ environment = 'test' } = {}) {
         teacher: belongsTo('teacher'),
         type: belongsTo('courseType'),
         sales: belongsTo('sale'),
-        schedule:belongsTo('schedule'),
+        schedule: belongsTo('schedule'),
       }),
       studentCourse: Model.extend({
         course: belongsTo('course'),
@@ -40,7 +40,6 @@ export function makeServer({ environment = 'test' } = {}) {
         studentCourses: hasMany(),
         type: belongsTo('studentType'),
       }),
-
     },
 
     seeds(server) {
@@ -63,19 +62,48 @@ export function makeServer({ environment = 'test' } = {}) {
 
       this.namespace = 'api';
 
-      this.get('/teachers',(schema,request) => {
-        const {query} = request.queryParams
-        console.log(schema)
-      })
+      this.get('/course/type', (schema) => {
+        const courseType = schema.courseTypes.all().models;
+        return new Response(
+          200,
+          {},
+          {
+            code: 0,
+            msg: 'success',
+            data: {
+              courseType,
+            },
+          }
+        );
+      });
+
+      this.get('/teachers', (schema, request) => {
+        const { query } = request.queryParams;
+        const all = schema.teachers.all().models;
+        // let teacherInfo = all.filter((item) => !query || item.name.includes(query)).models;
+        // console.log(teacherInfo)
+
+        return new Response(
+          200,
+          {},
+          {
+            code: 0,
+            msg: 'success',
+            data: {
+              all,
+            },
+          }
+        );
+      });
 
       this.get('/course', (schema, request) => {
-        const id = request.queryParams.id; 
+        const id = request.queryParams.id;
         let courseData = schema.courses.findBy({ id });
-        courseData.attrs.sales = courseData.sales.attrs
-        courseData.attrs.teacherName = courseData.teacher.name
-        courseData.attrs.typeName = courseData.type.name
-        let schedules = courseData.schedule.attrs
-      
+        courseData.attrs.sales = courseData.sales.attrs;
+        courseData.attrs.teacherName = courseData.teacher.name;
+        courseData.attrs.typeName = courseData.type.name;
+        let schedules = courseData.schedule.attrs;
+
         if (courseData) {
           return new Response(
             200,
@@ -84,11 +112,11 @@ export function makeServer({ environment = 'test' } = {}) {
               code: 0,
               msg: 'success',
               data: {
-                courseData
+                courseData,
               },
-              process:{
-                schedules
-              }
+              process: {
+                schedules,
+              },
             }
           );
         }
@@ -135,7 +163,7 @@ export function makeServer({ environment = 'test' } = {}) {
         let studentInfo = all.filter((item) => !query || item.name.includes(query)).models;
         const total = !query ? all.length : studentInfo.length;
         let data = { total, studentInfo };
-        if (limit && page) { 
+        if (limit && page) {
           const start = limit * (page - 1);
           studentInfo = studentInfo.slice(start, start + limit);
           data = { ...data, paginator: { limit, page, total } };

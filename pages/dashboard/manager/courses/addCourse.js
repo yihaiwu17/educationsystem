@@ -1,6 +1,6 @@
 import { Steps } from 'antd';
 import AppLayout from '../../../../component/Layout';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import AddCourseForm from '../../../../component/AddCourseForm'
 
 export default function AddCourse() {
