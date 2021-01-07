@@ -62,6 +62,21 @@ export function makeServer({ environment = 'test' } = {}) {
 
       this.namespace = 'api';
 
+      this.get('/course/code', (schema) => {
+        const courseCode = '45ju4fui8'
+        return new Response(
+          200,
+          {},
+          {
+            code: 0,
+            msg: 'success',
+            data: {
+              courseCode,
+            },
+          }
+        );
+      });
+
       this.get('/course/type', (schema) => {
         const courseType = schema.courseTypes.all().models;
         return new Response(

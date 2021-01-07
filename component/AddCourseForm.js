@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Row, Col, Input, Select } from 'antd';
+import { Form, Row, Col, Input, Select, DatePicker, InputNumber } from 'antd';
 import { teachersApi, courseTypeApi } from '../services/apiService';
+import { getTime } from 'date-fns';
 
 export default function AddCourseForm() {
   const [teachers, setTeachers] = useState([]);
@@ -61,7 +62,41 @@ export default function AddCourseForm() {
                   </Select>
                 </Form.Item>
               </Col>
+
+              <Col span={8}>
+                <Form.Item label="Course Code" name="uid" rules={[{ required: true }]}>
+                  <Input type="text" placeholder="course code" disabled />
+                </Form.Item>
+              </Col>
             </Row>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8}>
+            <Form.Item label="Start Date" name="startTime">
+              <DatePicker
+                style={{ width: '100%' }}
+                disabledDate={(current) => {
+                  const today = getTime(new Date());
+                  const date = current.valueOf();
+
+                  return today > date;
+                }}
+              ></DatePicker>
+            </Form.Item>
+
+            <Form.Item label="Price" name="price" rules={[{ required: true }]}>
+              <InputNumber
+                formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                min={0}
+                style={{ width: '100%' }}
+              ></InputNumber>
+            </Form.Item>
+
+            <Form.Item label="Student Limit" name="maxStudents" rules={[{ required: true }]}>
+              <InputNumber min={1} max={10} style={{ width: '100%' }}></InputNumber>
+            </Form.Item>
           </Col>
         </Row>
       </Form>

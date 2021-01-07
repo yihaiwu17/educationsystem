@@ -79,3 +79,11 @@ export const courseTypeApi = async () => {
     .catch((err) => errorHandler(err));
   return res;
 };
+
+export const courseCodeApi = async () => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.course+"/"+secondPaths.code))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};

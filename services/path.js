@@ -15,6 +15,7 @@ export const secondPaths = {
   delete: 'delete',
   update:'update',
   type:'type',
+  code:'code',
 };
 
 export const createUrl = (paths, params) => {
