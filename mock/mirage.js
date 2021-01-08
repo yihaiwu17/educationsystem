@@ -95,8 +95,8 @@ export function makeServer({ environment = 'test' } = {}) {
       this.get('/teachers', (schema, request) => {
         const { query } = request.queryParams;
         const all = schema.teachers.all().models;
-        // let teacherInfo = all.filter((item) => !query || item.name.includes(query)).models;
-        // console.log(teacherInfo)
+        let teacherInfo = all.filter((item) => !query || item.name.toLowerCase().includes(query));
+        console.log(teacherInfo)
 
         return new Response(
           200,
@@ -105,7 +105,7 @@ export function makeServer({ environment = 'test' } = {}) {
             code: 0,
             msg: 'success',
             data: {
-              all,
+              teacherInfo,
             },
           }
         );
