@@ -57,7 +57,7 @@ export function makeServer({ environment = 'test' } = {}) {
 
     routes() {
       this.passthrough((request) => {
-        if (request.url === '/_next/static/development/_devPagesManifest.json') return true;
+        if (request.url === '/_next/static/development/_devPagesManifest.json' || request.url.includes('www.mocky.io')) return true;
       });
 
       this.namespace = 'api';

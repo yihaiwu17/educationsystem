@@ -1,11 +1,33 @@
-import { Steps } from 'antd';
+import { Steps, Result, Button } from 'antd';
 import AppLayout from '../../../../component/Layout';
 import React, { useState } from 'react';
-import AddCourseForm from '../../../../component/AddCourseForm'
+import AddCourseForm from '../../../../component/AddCourseForm';
+import ChapterForm from '../../../../component/ChapterForm';
+import { useRouter } from 'next/router';
 
 export default function AddCourse() {
+  const router = useRouter();
+
   const [currentStep, setCurrentStep] = useState(0);
-  const steps=[<AddCourseForm/>]
+  const steps = [
+    <AddCourseForm />,
+    <ChapterForm/>,
+    <Result
+      status="success"
+      title="Successfully Create Course"
+      extra={[
+        <Button type="primary" key="detail"
+        >
+          Go Console
+        </Button>,
+        <Button key="again"
+        onClick={() => {
+          router.reload();
+        }}
+        >Create Again</Button>,
+      ]}
+    />,
+  ];
 
   return (
     <AppLayout>
@@ -22,10 +44,10 @@ export default function AddCourse() {
         <Steps.Step title="Success" />
       </Steps>
 
-      {steps.map((content,index) => (
-          <div key={index} style={{display: index === currentStep ? 'block':'none'}}>
-              {content}
-          </div>
+      {steps.map((content, index) => (
+        <div key={index} style={{ display: index === currentStep ? 'block' : 'none' }}>
+          {content}
+        </div>
       ))}
     </AppLayout>
   );
