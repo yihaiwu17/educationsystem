@@ -1,27 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Space, Select, Row, Col, message, TimePicker} from 'antd';
+import { Form, Input, Button, Space, Select, Row, Col, message, TimePicker } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import FormItem from 'antd/lib/form/FormItem';
 
-const weekDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-const chapterInfo ='chapterInfo'
-const classInfo = 'classInfo'
+const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const chapterInfo = 'chapterInfo';
+const classInfo = 'classInfo';
 const { Option } = Select;
 
 export default function ChapterForm() {
   const [form] = Form.useForm();
+  const [selectedWeekdays, setSelectedWeekdays] = useState([]);
+  const updateSelectedWeekdays = (namePath) => {
+    const selected = form.getFieldValue(classInfo) || [];
+    let result = selected.map((item) => item.weekday);
 
+    if (namePath) {
+      const value = form.getFieldValue(namePath);
 
-  const initialValue ={
-      [chapterInfo]:[{name:'',content:''}],
-      [classInfo]:[{weekday:'',time:''}],
-  }
+      result = result.filter((item) => item !== value);
+    }
+    setSelectedWeekdays(result);
+  };
+
+  const initialValue = {
+    [chapterInfo]: [{ name: '', content: '' }],
+    [classInfo]: [{ weekday: '', time: '' }],
+  };
   const onFinish = (values) => {
     console.log('Received values of form:', values);
   };
 
   const handleChange = () => {
-    form.setFieldsValue({ sights: [] });//need to change
+    form.setFieldsValue({ chapterInfo: [] });
   };
 
   return (
@@ -44,8 +54,8 @@ export default function ChapterForm() {
                     <Col span={8}>
                       <Form.Item
                         {...field}
-                        name={([field.name, 'name'])}
-                        fieldKey={[field.fieldKey,'name']}
+                        name={[field.name, 'name']}
+                        fieldKey={[field.fieldKey, 'name']}
                         rules={[{ required: true }]}
                       >
                         <Input size="large" placeholder="Chapter Name"></Input>
@@ -55,7 +65,7 @@ export default function ChapterForm() {
                       <Form.Item
                         {...field}
                         name={[field.name, 'content']}
-                        fieldKey={[field.fieldKey,'content']}
+                        fieldKey={[field.fieldKey, 'content']}
                         rules={[{ required: true }]}
                       >
                         <Input size="large" placeholder="Chapter Content"></Input>
@@ -98,33 +108,34 @@ export default function ChapterForm() {
                     <Col span={8}>
                       <Form.Item
                         {...field}
-                        name={([field.name, 'weekday'])}
-                        fieldKey={[field.fieldKey,'weekday']}
+                        name={[field.name, 'weekday']}
+                        fieldKey={[field.fieldKey, 'weekday']}
                         rules={[{ required: true }]}
                       >
-                        <Select size='large'>
-                            {weekDays.map((day)=>(
-                                <Option key={day} value={day}>
-                                    {day}
-                                </Option>
-                            ))}
+                        <Select size="large">
+                          {weekDays.map((day) => (
+                            <Option key={day} value={day} disabled={selectedWeekdays.includes(day)}>
+                              {day}
+                            </Option>
+                          ))}
                         </Select>
                       </Form.Item>
                     </Col>
                     <Col span={12}>
                       <Form.Item
                         {...field}
-                        name={([field.name, 'time'])}
-                        fieldKey={[field.fieldKey,'time']}
+                        name={[field.name, 'time']}
+                        fieldKey={[field.fieldKey, 'time']}
                         rules={[{ required: true }]}
                       >
-                       <TimePicker size='large' style={{width:'100%'}}></TimePicker>
+                        <TimePicker size="large" style={{ width: '100%' }}></TimePicker>
                       </Form.Item>
                     </Col>
                     <Col span={2}>
                       <MinusCircleOutlined
                         onClick={() => {
                           if (fields.length > 1) {
+                            updateSelectedWeekdays([classInfo, field.name, 'weekday']);
                             remove(field.name);
                           } else {
                             message.warn('You must set at least one class time');
@@ -137,7 +148,16 @@ export default function ChapterForm() {
                 <Row>
                   <Col span={20}>
                     <Form.Item>
-                      <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />} disabled={fields.length >= 7}>
+                      <Button
+                        type="dashed"
+                        onClick={() => {
+                          updateSelectedWeekdays();
+                          add();
+                        }}
+                        block
+                        icon={<PlusOutlined />}
+                        disabled={fields.length >= 7}
+                      >
                         Add chapters
                       </Button>
                     </Form.Item>

@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Form,
-  Row,
-  Col,
-  Input,
-  Select,
-  DatePicker,
-  InputNumber,
-  Upload,
-  Button,
-} from 'antd';
-import { teachersApi, courseTypeApi,courseCodeApi } from '../services/apiService';
+import { Form, Row, Col, Input, Select, DatePicker, InputNumber, Upload, Button } from 'antd';
+import { teachersApi, courseTypeApi, courseCodeApi } from '../services/apiService';
 import { getTime } from 'date-fns';
 import NumberWithUni from '../component/NumberWithUnit';
 import TextArea from 'antd/lib/input/TextArea';
@@ -21,26 +11,38 @@ import styled from 'styled-components';
 const DurationUnit = ['hour', 'day', 'week', 'month', 'year'];
 
 const UploadItem = styled(Form.Item)`
-  .ant-upload.ant-upload-select-picture-card{
-    width:100%;
-    margin:0;
+  .ant-upload.ant-upload-select-picture-card {
+    width: 100%;
+    margin: 0;
   }
   .ant-upload-picture-card-wrapper,
   .ant-form-item-control-input,
-  .ant-form-item-control-input div{
+  .ant-form-item-control-input div {
     height: 100%;
   }
-  ant-upload-list-picture-card{
-    width:100%;
+  ant-upload-list-picture-card {
+    width: 100%;
   }
-`
+  .ant-upload.ant-upload-select-picture-card {
+    height: 295px;
+    width: 152%;
+  }
+  .ant-form-item-control {
+    position: absolute;
+    inset: 0;
+    top: 37px;
+    bottom: 30px;
+  }
+  .ant-upload-list-picture-card-container {
+    width: 100%;
+  }
+`;
 
 export default function AddCourseForm() {
   const [teachers, setTeachers] = useState([]);
   const [courseType, setCourseType] = useState([]);
   const [fileList, setFileList] = useState([]);
-  const [courseCode,setCourseCode] = useState([]);
-
+  const [courseCode, setCourseCode] = useState([]);
 
   const onChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
@@ -62,11 +64,11 @@ export default function AddCourseForm() {
   };
 
   useEffect(() => {
-    courseCodeApi().then((res)=>{
-      const courseCode = res.data.data.courseCode
-      setCourseCode(courseCode)
-      console.log(courseCode)
-    })
+    courseCodeApi().then((res) => {
+      const courseCode = res.data.data.courseCode;
+      setCourseCode(courseCode);
+      console.log(courseCode);
+    });
 
     courseTypeApi().then((res) => {
       const courseType = res.data.data.courseType;
@@ -124,9 +126,16 @@ export default function AddCourseForm() {
               </Col>
 
               <Col span={8}>
-                 {courseCode && <Form.Item label="Course Code" name="uid" rules={[{ required: true }]} initialValue={courseCode}>
-                  <Input disabled/>
-                </Form.Item>}
+                {courseCode && (
+                  <Form.Item
+                    label="Course Code"
+                    name="uid"
+                    rules={[{ required: true }]}
+                    initialValue={courseCode}
+                  >
+                    <Input disabled />
+                  </Form.Item>
+                )}
               </Col>
             </Row>
           </Col>
@@ -168,47 +177,48 @@ export default function AddCourseForm() {
             </Form.Item>
           </Col>
           <Col span={16}>
-            <Row style={{marginLeft:'-10px'}}>
-            <Col span={12} style={{ position: 'relative' }}>
-            <Form.Item
-              label="Description"
-              name="detail"
-              rules={[
-                { required: true },
-                { min: 100, max: 1000, message: 'Description must between 100 and 1000' },
-              ]}
-            >
-              <TextArea
-                placeholder="Course description"
-                style={{ height: '100%' }}
-                rows="13"
-                cols='13'
-              ></TextArea>
-            </Form.Item>
-          </Col>
-          <Col span={8} style={{ position: 'relative' }}>
-            <UploadItem label="Cover" name="cover">
-              <ImgCrop rotate aspect={16 / 9}>
-                <Upload
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  listType="picture-card"
-                  fileList={fileList}
-                  onChange={onChange}
-                  onPreview={onPreview}
+            <Row style={{ marginLeft: '-10px' }}>
+              <Col span={12} style={{ position: 'relative' }}>
+                <Form.Item
+                  label="Description"
+                  name="detail"
+                  rules={[
+                    { required: true },
+                    { min: 100, max: 1000, message: 'Description must between 100 and 1000' },
+                  ]}
                 >
-                  {fileList.length >= 1 ? null : (
-                      <div>
-                      <InboxOutlined></InboxOutlined>
-                      <p>Click or drag file to this area to upload</p>
-                      </div>
-                  )}
-                </Upload>
-              </ImgCrop>
-            </UploadItem>
-          </Col>
+                  <TextArea
+                    placeholder="Course description"
+                    style={{ height: '100%' }}
+                    rows="13"
+                    cols="13"
+                  ></TextArea>
+                </Form.Item>
+              </Col>
+              <Col span={8} style={{ position: 'relative' }}>
+                <UploadItem label="Cover" name="cover">
+                  <ImgCrop rotate aspect={16 / 9}>
+                    <Upload
+                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                      listType="picture-card"
+                      fileList={fileList}
+                      onChange={onChange}
+                      onPreview={onPreview}
+                    >
+                      {fileList.length >= 1 ? null : (
+                        <div
+                          style={{ fontSize: '30px', alignItems: 'center', textAlign: 'center' }}
+                        >
+                          <InboxOutlined></InboxOutlined>
+                          <p>Click or drag file to this area to upload</p>
+                        </div>
+                      )}
+                    </Upload>
+                  </ImgCrop>
+                </UploadItem>
+              </Col>
             </Row>
           </Col>
-         
         </Row>
         <Row>
           <Col span={8}>

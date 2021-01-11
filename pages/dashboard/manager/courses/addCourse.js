@@ -11,20 +11,22 @@ export default function AddCourse() {
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
     <AddCourseForm />,
-    <ChapterForm/>,
+    <ChapterForm />,
     <Result
       status="success"
       title="Successfully Create Course"
       extra={[
-        <Button type="primary" key="detail"
-        >
+        <Button type="primary" key="detail">
           Go Console
         </Button>,
-        <Button key="again"
-        onClick={() => {
-          router.reload();
-        }}
-        >Create Again</Button>,
+        <Button
+          key="again"
+          onClick={() => {
+            router.reload();
+          }}
+        >
+          Create Again
+        </Button>,
       ]}
     />,
   ];
