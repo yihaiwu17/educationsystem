@@ -31,7 +31,7 @@ export default function WeekdaysTable({data}) {
                     Array.prototype.forEach.call(parent.childNodes,(item)=>{
                         item.style.background='transparent'
                     })
-                    parent.style.background='transparent'
+                    parent.style.background='transparent'   
                 }
             })}
         >

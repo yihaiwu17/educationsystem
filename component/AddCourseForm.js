@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Row, Col, Input, Select, DatePicker, InputNumber, Upload, Button } from 'antd';
+import { Row, Col, Input, Select, DatePicker, InputNumber, Upload, Button } from 'antd';
 import { teachersApi, courseTypeApi, courseCodeApi } from '../services/apiService';
 import { getTime } from 'date-fns';
+import Form from 'antd/lib/form';
+import { useForm } from 'antd/lib/form/Form';
 import NumberWithUni from '../component/NumberWithUnit';
 import TextArea from 'antd/lib/input/TextArea';
 import ImgCrop from 'antd-img-crop';
-import { InboxOutlined } from '@ant-design/icons';
+import { InboxOutlined,CloseCircleOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 
 const DurationUnit = ['hour', 'day', 'week', 'month', 'year'];
@@ -38,13 +40,35 @@ const UploadItem = styled(Form.Item)`
   }
 `;
 
+const validateDuration = (_, value) => {
+  if (value.number > 0) {
+    return Promise.resolve();
+  }
+
+  return Promise.reject('Duration must be greater than zero!');
+};
+
 export default function AddCourseForm() {
+  const [form] = useForm();
   const [teachers, setTeachers] = useState([]);
   const [courseType, setCourseType] = useState([]);
   const [fileList, setFileList] = useState([]);
-  const [courseCode, setCourseCode] = useState([]);
+  
+  const [isUploading, setIsUploading] = useState(false);
 
-  const onChange = ({ fileList: newFileList }) => {
+  const onChange = ({ fileList: newFileList,file }) => {
+    const { status } = file;
+
+    if (file.response) {
+      const { url } = file.response;
+
+      form.setFieldsValue({ cover: url });
+    } else {
+      // form.setFieldsValue({ cover: course.cover || '' });
+      form.setFieldsValue({ });
+    }
+
+    setIsUploading(status === 'uploading');
     setFileList(newFileList);
   };
 
@@ -65,9 +89,10 @@ export default function AddCourseForm() {
 
   useEffect(() => {
     courseCodeApi().then((res) => {
-      const courseCode = res.data.data.courseCode;
-      setCourseCode(courseCode);
-      console.log(courseCode);
+      const courseCodes = res.data.data.courseCode;
+      console.log(courseCodes);
+      form.setFieldsValue({ uid: [courseCodes] });
+      // setCourseCode(courseCode);
     });
 
     courseTypeApi().then((res) => {
@@ -78,7 +103,7 @@ export default function AddCourseForm() {
 
   return (
     <>
-      <Form labelCol={{ offset: 1 }} wrapperCol={{ offset: 1 }} layout="vertical">
+      <Form labelCol={{ offset: 1 }} wrapperCol={{ offset: 1 }} layout="vertical" form={form}>
         <Row>
           <Col span={8}>
             <Form.Item
@@ -126,16 +151,9 @@ export default function AddCourseForm() {
               </Col>
 
               <Col span={8}>
-                {courseCode && (
-                  <Form.Item
-                    label="Course Code"
-                    name="uid"
-                    rules={[{ required: true }]}
-                    initialValue={courseCode}
-                  >
-                    <Input disabled />
-                  </Form.Item>
-                )}
+                <Form.Item label="Course Code" name="uid" rules={[{ required: true }]}>
+                  <Input disabled type="text" placeholder="course code" />
+                </Form.Item>
               </Col>
             </Row>
           </Col>
@@ -167,7 +185,11 @@ export default function AddCourseForm() {
               <InputNumber min={1} max={10} style={{ width: '100%' }}></InputNumber>
             </Form.Item>
 
-            <Form.Item label="Duration" name="duration" rules={[{ required: true }]}>
+            <Form.Item
+              label="Duration"
+              name="duration"
+              rules={[{ required: true }, { validator: validateDuration }]}
+            >
               <NumberWithUni
                 options={new Array(5)
                   .fill('')
@@ -216,6 +238,14 @@ export default function AddCourseForm() {
                     </Upload>
                   </ImgCrop>
                 </UploadItem>
+                {isUploading && (
+                  <CloseCircleOutlined
+                    onClick={() => {
+                      setIsUploading(false);
+                      setFileList([]);
+                    }}
+                  />
+                )}
               </Col>
             </Row>
           </Col>

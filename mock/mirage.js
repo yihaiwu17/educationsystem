@@ -63,7 +63,8 @@ export function makeServer({ environment = 'test' } = {}) {
       this.namespace = 'api';
 
       this.get('/course/code', (schema) => {
-        const courseCode = '45ju4fui8'
+       
+        const courseCode =  Math.random().toString(32).split('.')[1];
         return new Response(
           200,
           {},
@@ -94,8 +95,8 @@ export function makeServer({ environment = 'test' } = {}) {
 
       this.get('/teachers', (schema, request) => {
         const { query } = request.queryParams;
-        const all = schema.teachers.all().models;
-        let teacherInfo = all.filter((item) => !query || item.name.toLowerCase().includes(query));
+        const all = schema.teachers.all();
+        let teacherInfo = all.filter((item) => !query || item.name.toLowerCase().includes(query)).models;
         console.log(teacherInfo)
 
         return new Response(
