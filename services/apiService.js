@@ -87,3 +87,27 @@ export const courseCodeApi = async () => {
     .catch((err) => errorHandler(err));
   return res;
 };
+
+export const addCourseApi = async (req) => {
+  const res = await axiosApi
+    .post(firstPaths.courses+"/"+secondPaths.add, req)
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
+export const updateCourseApi = async (req) => {
+  const res = await axiosApi
+    .post(firstPaths.courses+"/"+secondPaths.update, req)
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
+export const updateProcessApi = async (req) => {
+  const res = await axiosApi
+    .post(firstPaths.courses+"/"+secondPaths.process, req)
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};

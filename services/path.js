@@ -16,6 +16,7 @@ export const secondPaths = {
   update:'update',
   type:'type',
   code:'code',
+  process:'process',
 };
 
 export const createUrl = (paths, params) => {

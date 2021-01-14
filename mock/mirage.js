@@ -1,4 +1,5 @@
 // mirage.js
+import { format } from 'date-fns';
 import { belongsTo, createServer, hasMany, Model, Response } from 'miragejs';
 import { firstPaths, secondPaths } from '../services/path';
 const students = require('../mock/data/student.json');
@@ -11,6 +12,7 @@ const studentTypes = require('../mock/data/student_type.json');
 const studentProfiles = require('../mock/data/student_profile.json');
 const sales = require('../mock/data/sales.json');
 const schedules = require('../mock/data/schedule.json');
+const process = require('../mock/data/process.json');
 
 export function makeServer({ environment = 'test' } = {}) {
   let server = createServer({
@@ -40,6 +42,7 @@ export function makeServer({ environment = 'test' } = {}) {
         studentCourses: hasMany(),
         type: belongsTo('studentType'),
       }),
+      process: Model,
     },
 
     seeds(server) {
@@ -47,6 +50,7 @@ export function makeServer({ environment = 'test' } = {}) {
       courseTypes.forEach((type) => server.create('courseType', type));
       teachers.forEach((teacher) => server.create('teacher', teacher));
       sales.forEach((sale) => server.create('sale', sale));
+      process.forEach((process) => server.create('process', process));
       schedules.forEach((schedule) => server.create('schedule', schedule));
       courses.forEach((course) => server.create('course', course));
       studentCourses.forEach((course) => server.create('studentCourse', course));
@@ -171,6 +175,113 @@ export function makeServer({ environment = 'test' } = {}) {
         }
       });
 
+      this.post('/courses/add', (schema, req) => {
+        const body = JSON.parse(req.requestBody);
+        console.log(body)
+        const {
+          name,
+          uid,
+          cover,
+          detail,
+          duration,
+          maxStudents,
+          price,
+          startTime,
+          typeId,
+          durationUnit,
+          teacherId,
+        } = body;
+        const process = schema.processes.create({
+          status: 0,
+          current: 0,
+          classTime: null,
+          chapters: null,
+        });
+
+        const sales = schema.sales.create({
+          batches: 0,
+          price,
+          earnings: 0,
+          paidAmount: 0,
+          studentAmount: 0,
+          paidIds: [],
+        });
+
+        const data = schema.db.courses.insert({
+          name,
+          uid,
+          detail,
+          startTime,
+          price,
+          maxStudents,
+          sales,
+          process,
+          star: 0,
+          status: 0,
+          duration,
+          durationUnit,
+          cover,
+          teacherId,
+          typeId,
+          ctime: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+        });
+ 
+
+        // data.typeName = schema.courseTypes.findBy({id}).name;
+        // data.processId = process.id;
+
+        return new Response(200, {}, { msg: 'success', code: 200, data });
+      });
+
+      this.post('/courses/update', (schema, req) => {
+        const { id, ...others} = JSON.parse(req.requestBody);
+        const target = schema.courses.findBy({ id });
+
+        if (target) {
+          const data = target.update({
+            ...others
+          });
+
+          data.attrs.typeName = data.type.name;
+
+          return new Response(200, {}, { msg: 'success', code: 200, data });
+        } else {
+          return new Response(400, {}, { msg: `can\'t find course by id ${id} `, code: 400 });
+        }
+      });
+
+      this.post('/courses/process', (schema, req) => {
+        const body = JSON.parse(req.requestBody);
+        const { processId, courseId } = body;
+        let target;
+
+        if (!!processId || !!courseId) {
+          if (processId) {
+            target = schema.processes.findBy({ id });
+          } else {
+            target = schema.courses.findBy({ id }).process;
+          }
+          const { classTime, chapters } = body;
+
+          target.update({
+            current: 0,
+            status: 0,
+            chapters: chapters.map((item, index) => ({ ...item, id })),
+            classTime,
+          });
+
+          return new Response(200, {}, { msg: 'success', code: 200, data: true });
+        } else {
+          return new Response(
+            400,
+            {},
+            {
+              msg: `can\'t find process by course ${courseId} or processId ${processId} `,
+              code: 400,
+            }
+          );
+        }
+      });
       this.get('/students', (schema, request) => {
         const limit = request.queryParams.limit;
         const page = request.queryParams.page;

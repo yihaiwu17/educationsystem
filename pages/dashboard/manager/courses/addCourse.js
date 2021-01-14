@@ -7,11 +7,23 @@ import { useRouter } from 'next/router';
 
 export default function AddCourse() {
   const router = useRouter();
-
+  const [courseId, setCourseId] = useState(null);
+  const [processId, setProcessId] = useState(null);
+  const [availableNavigate, setAvailableNavigate] = useState([0]);
   const [currentStep, setCurrentStep] = useState(0);
+  const moveToNex = () => {
+    setCurrentStep(currentStep + 1);
+    setAvailableNavigate([...availableNavigate, currentStep + 1]);
+  };
   const steps = [
-    <AddCourseForm />,
-    <ChapterForm />,
+    <AddCourseForm 
+    onSuccess={(course) => {
+      setCourseId(course.id);
+      setProcessId(course.processId);
+      moveToNex();
+    }}
+    />,
+    <ChapterForm courseId={courseId} processId={processId} onSuccess={moveToNex}/>,
     <Result
       status="success"
       title="Successfully Create Course"
@@ -38,7 +50,9 @@ export default function AddCourse() {
         style={{ margin: '20px 0', padding: '1em 1.6%' }}
         current={currentStep}
         onChange={(current) => {
-          setCurrentStep(current);
+          if (availableNavigate.includes(current)) {
+            setCurrentStep(current);
+          }
         }}
       >
         <Steps.Step title="Course Detail" />

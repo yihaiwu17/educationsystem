@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Space, Select, Row, Col, message, TimePicker } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import {updateProcessApi} from '../services/apiService'
 
 const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const chapterInfo = 'chapterInfo';
-const classInfo = 'classInfo';
+const clsTime = 'classTime';
+const cpts = 'chapters';
 const { Option } = Select;
 
-export default function ChapterForm() {
+export default function ChapterForm({ courseId, onSuccess, processId, isAdd = true }) {
   const [form] = Form.useForm();
   const [selectedWeekdays, setSelectedWeekdays] = useState([]);
   const updateSelectedWeekdays = (namePath) => {
-    const selected = form.getFieldValue(classInfo) || [];
+    const selected = form.getFieldValue(clsTime) || [];
     let result = selected.map((item) => item.weekday);
 
     if (namePath) {
@@ -23,21 +24,33 @@ export default function ChapterForm() {
   };
 
   const initialValue = {
-    [chapterInfo]: [{ name: '', content: '' }],
-    [classInfo]: [{ weekday: '', time: '' }],
+    [cpts]: [{ name: '', content: '' }],
+    [clsTime]: [{ weekday: '', time: '' }],
   };
   const onFinish = (values) => {
-    console.log('Received values of form:', values);
+    if (!courseId && !processId) {
+      message.error('You must select a course to update!');
+      return;
+    }
+
+    const { classTime: origin, chapters  } = values;
+    const classTime = origin.map(({ weekday, time }) => `${weekday} ${format(time, 'hh:mm:ss')}`);
+    const req = { chapters, classTime, processId, courseId };
+
+    updateProcessApi(req).then((res) => {
+      const { data } = res;
+
+      if (!!onSuccess && data) {
+        onSuccess(true);
+      }
+    });
   };
 
-  const handleChange = () => {
-    form.setFieldsValue({ chapterInfo: [] });
-  };
 
   return (
     <Form
       form={form}
-      name="course schedule"
+      name="process"
       onFinish={onFinish}
       autoComplete="off"
       style={{ padding: '0 1.6%' }}
@@ -46,7 +59,7 @@ export default function ChapterForm() {
       <Row gutter={[6, 16]}>
         <Col span={12}>
           <h2>Chapter</h2>
-          <Form.List name={chapterInfo}>
+          <Form.List name={cpts}>
             {(fields, { add, remove }) => (
               <>
                 {fields.map((field) => (
@@ -100,7 +113,7 @@ export default function ChapterForm() {
 
         <Col span={12}>
           <h2>Class times </h2>
-          <Form.List name={classInfo}>
+          <Form.List name='classInfo'>
             {(fields, { add, remove }) => (
               <>
                 {fields.map((field) => (
@@ -135,7 +148,7 @@ export default function ChapterForm() {
                       <MinusCircleOutlined
                         onClick={() => {
                           if (fields.length > 1) {
-                            updateSelectedWeekdays([classInfo, field.name, 'weekday']);
+                            updateSelectedWeekdays([clsTime, field.name, 'weekday']);
                             remove(field.name);
                           } else {
                             message.warn('You must set at least one class time');
@@ -150,6 +163,7 @@ export default function ChapterForm() {
                     <Form.Item>
                       <Button
                         type="dashed"
+                        size="large"
                         onClick={() => {
                           updateSelectedWeekdays();
                           add();
@@ -158,7 +172,7 @@ export default function ChapterForm() {
                         icon={<PlusOutlined />}
                         disabled={fields.length >= 7}
                       >
-                        Add chapters
+                        Add Class Time
                       </Button>
                     </Form.Item>
                   </Col>
