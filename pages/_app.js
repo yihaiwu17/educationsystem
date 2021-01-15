@@ -1,4 +1,5 @@
 import React from "react";
+import '../styles/globals.css';
 import App from "next/app";
 import "../styles/antd.less";
 import { makeServer } from "../mock/mirage"

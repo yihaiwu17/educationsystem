@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Space, Select, Row, Col, message, TimePicker } from 'antd';
+import { Input, Button, Space, Select, Row, Col, message, TimePicker } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import {updateProcessApi} from '../services/apiService'
+import { format } from 'date-fns';
+import Form from 'antd/lib/form';
+
 
 const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const clsTime = 'classTime';
@@ -28,10 +31,10 @@ export default function ChapterForm({ courseId, onSuccess, processId, isAdd = tr
     [clsTime]: [{ weekday: '', time: '' }],
   };
   const onFinish = (values) => {
-    if (!courseId && !processId) {
-      message.error('You must select a course to update!');
-      return;
-    }
+    // if (!courseId && !processId) {
+    //   message.error('You must select a course to update!');
+    //   return;
+    // }
 
     const { classTime: origin, chapters  } = values;
     const classTime = origin.map(({ weekday, time }) => `${weekday} ${format(time, 'hh:mm:ss')}`);
@@ -113,7 +116,7 @@ export default function ChapterForm({ courseId, onSuccess, processId, isAdd = tr
 
         <Col span={12}>
           <h2>Class times </h2>
-          <Form.List name='classInfo'>
+          <Form.List name="classTime">
             {(fields, { add, remove }) => (
               <>
                 {fields.map((field) => (

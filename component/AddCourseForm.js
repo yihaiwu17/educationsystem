@@ -40,6 +40,12 @@ const UploadItem = styled(Form.Item)`
     width: 100%;
     margin: 0;
   }
+  .ant-form-item-control {
+    position: absolute;
+    inset: 0;
+    top: 37px;
+    bottom: 30px;
+  }
   .ant-upload-picture-card-wrapper,
   .ant-form-item-control-input,
   .ant-form-item-control-input div {
@@ -115,16 +121,18 @@ export default function AddCourseForm({ course, onSuccess }) {
     // if (file.response) {
     //   const { url } = file.response;
 
-    //   form.setFieldsValue({ cover: url });
+    //   form.setFieldsValue({ url });
     // } else {
     //   // form.setFieldsValue({ cover: course.cover || '' });
     //   form.setFieldsValue({});
     // }
+    // console.log(file.response)
+    // setIsUploading(status === 'uploading');
+    // setFileList(newFileList);
 
     setIsUploading(file.status === 'uploading');
     setFileList(newFileList);
     console.log(file)
-    console.log(file.response)
     if(file.status === 'done'){
       form.setFieldsValue({cover:file.response.url})
     }
@@ -140,14 +148,14 @@ export default function AddCourseForm({ course, onSuccess }) {
         reader.onerror = (error) => reject(error);
       });
     }
-    // setPreview({
-    //   previewImage: file.url || file.preview,
-    //   previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
-    // });
-    const image = new Image();
-    image.src = file.url;
-    const imgWindow = window.open(src);
-    imgWindow.document.write(image.outerHTML);
+    setPreview({
+      previewImage: file.url || file.preview,
+      previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+    });
+    // const image = new Image();
+    // image.src = file.url;
+    // const imgWindow = window.open(src);
+    // imgWindow.document.write(image.outerHTML);
   };
 
   useEffect(() => {
@@ -163,10 +171,10 @@ export default function AddCourseForm({ course, onSuccess }) {
   }, []);
 
   const onFinish = async (values) => {
-    if (!isAdd && !course) {
-      message.error('You must select a course to update!');
-      return;
-    }
+    // if (!isEdit && !course) {
+    //   message.error('You must select a course to update!');
+    //   return;
+    // }
 
     const req = {
       ...values,
@@ -184,6 +192,8 @@ export default function AddCourseForm({ course, onSuccess }) {
     if (!!data && !course) {
       setIsAdd(false);
     }
+
+    const {id} = data;
 
     if (!!onSuccess && !!data) {
       onSuccess(data);
@@ -311,8 +321,8 @@ export default function AddCourseForm({ course, onSuccess }) {
                   ></TextArea>
                 </DescriptionTextArea>
               </Col>
-              <Col span={8} style={{ position: 'relative' }}>
-                <UploadItem label="Cover" name="cover">
+              <Col span={12} style={{ position: 'relative' }}>
+                <UploadItem label="Cover" name="cover" style={{height:'100%'}}>
                   <ImgCrop rotate aspect={16 / 9}>
                     <Upload
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
@@ -352,14 +362,14 @@ export default function AddCourseForm({ course, onSuccess }) {
           </Col>
         </Row>
       </Form>
-      {/* <Modal
+      <Modal
         visible={!!preview}
-        title={preview.previewTitle}
+        title={preview?.previewTitle}
         footer={null}
         onCancel={() => setPreview(null)}
       >
-        <img alt="example" style={{ width: '100%' }} src={preview.previewImage} />
-      </Modal> */}
+        <img alt="example" style={{ width: '100%' }} src={preview?.previewImage} />
+      </Modal>
     </>
   );
 }
