@@ -12,7 +12,7 @@ const studentTypes = require('../mock/data/student_type.json');
 const studentProfiles = require('../mock/data/student_profile.json');
 const sales = require('../mock/data/sales.json');
 const schedules = require('../mock/data/schedule.json');
-const process = require('../mock/data/process.json');
+
 
 export function makeServer({ environment = 'test' } = {}) {
   let server = createServer({
@@ -42,7 +42,7 @@ export function makeServer({ environment = 'test' } = {}) {
         studentCourses: hasMany(),
         type: belongsTo('studentType'),
       }),
-      process: Model,
+
     },
 
     seeds(server) {
@@ -50,7 +50,6 @@ export function makeServer({ environment = 'test' } = {}) {
       courseTypes.forEach((type) => server.create('courseType', type));
       teachers.forEach((teacher) => server.create('teacher', teacher));
       sales.forEach((sale) => server.create('sale', sale));
-      process.forEach((process) => server.create('process', process));
       schedules.forEach((schedule) => server.create('schedule', schedule));
       courses.forEach((course) => server.create('course', course));
       studentCourses.forEach((course) => server.create('studentCourse', course));
@@ -146,6 +145,7 @@ export function makeServer({ environment = 'test' } = {}) {
         const limit = request.queryParams.limit;
         const page = request.queryParams.page;
         let courses = schema.courses.all().models;
+        
         const total = courses.length;
 
         if (limit && page) {
@@ -177,7 +177,6 @@ export function makeServer({ environment = 'test' } = {}) {
 
       this.post('/courses/add', (schema, req) => {
         const body = JSON.parse(req.requestBody);
-        console.log(body)
         const {
           name,
           uid,
@@ -191,7 +190,7 @@ export function makeServer({ environment = 'test' } = {}) {
           durationUnit,
           teacherId,
         } = body;
-        const process = schema.processes.create({
+        const process = schema.schedules.create({
           status: 0,
           current: 0,
           classTime: null,
@@ -227,8 +226,9 @@ export function makeServer({ environment = 'test' } = {}) {
         });
  
 
-        // data.typeName = schema.courseTypes.findBy({id}).name;
-        // data.processId = process.id;
+        data.typeName = schema.courseTypes.findBy({id:typeId}).name;
+        data.processId = process.id;
+        console.log(data)
 
         return new Response(200, {}, { msg: 'success', code: 200, data });
       });
@@ -257,19 +257,21 @@ export function makeServer({ environment = 'test' } = {}) {
 
         if (!!processId || !!courseId) {
           if (processId) {
-            target = schema.processes.findBy({ id });
+            target = schema.schedules.findBy({ id:processId });
+            console.log(target)
           } else {
-            target = schema.courses.findBy({ id }).process;
+            target = schema.courses.findBy({  id:courseId }).schedule;
+            console.log(target)
           }
           const { classTime, chapters } = body;
 
           target.update({
             current: 0,
             status: 0,
-            chapters: chapters.map((item, index) => ({ ...item, id })),
+            chapters: chapters.map((item, index) => ({ ...item, id:index })),
             classTime,
           });
-
+          console.log('target',target)
           return new Response(200, {}, { msg: 'success', code: 200, data: true });
         } else {
           return new Response(

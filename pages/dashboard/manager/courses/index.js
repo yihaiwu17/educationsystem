@@ -14,6 +14,7 @@ export default function CoursesPage() {
 
   useEffect(() => {
     coursesDetailApi(paginator).then((res) => {
+      console.log(res)
       const total = res.data.data.total;
       const data = res.data.data.courses;
       const source = [...courseInfo, ...data];

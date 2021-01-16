@@ -116,26 +116,26 @@ export default function AddCourseForm({ course, onSuccess }) {
   const [isUploading, setIsUploading] = useState(false);
 
   const onChange = ({ fileList: newFileList, file }) => {
-    // const { status } = file;
+    const { status } = file;
 
-    // if (file.response) {
-    //   const { url } = file.response;
+    if (file?.response) {
+      const { url } = file.response;
 
-    //   form.setFieldsValue({ url });
-    // } else {
-    //   // form.setFieldsValue({ cover: course.cover || '' });
-    //   form.setFieldsValue({});
-    // }
-    // console.log(file.response)
-    // setIsUploading(status === 'uploading');
-    // setFileList(newFileList);
-
-    setIsUploading(file.status === 'uploading');
-    setFileList(newFileList);
-    console.log(file)
-    if(file.status === 'done'){
-      form.setFieldsValue({cover:file.response.url})
+      form.setFieldsValue({ cover:url });
+    } else {
+      form.setFieldsValue({ cover: course?.cover || '' });
+      // form.setFieldsValue({});
     }
+    console.log(file.response)
+    setIsUploading(status === 'uploading');
+    setFileList(newFileList);
+
+    // setIsUploading(file.status === 'uploading');
+    // setFileList(newFileList);
+    // console.log(file)
+    // if(file.status === 'done'){
+    //   form.setFieldsValue({cover:file.response.url})
+    // }
   };
 
   const onPreview = async (file) => {
@@ -187,16 +187,18 @@ export default function AddCourseForm({ course, onSuccess }) {
     };
     console.log(req);
     const response = isAdd ? addCourseApi(req) : updateCourseApi({ ...req, id: course.id });
+    console.log(response)
     const { data } = await response;
 
     if (!!data && !course) {
       setIsAdd(false);
     }
 
-    const {id} = data;
+    // const {id} = data;
 
     if (!!onSuccess && !!data) {
-      onSuccess(data);
+      console.log(data)
+      onSuccess(data.data);
     }
   };
 

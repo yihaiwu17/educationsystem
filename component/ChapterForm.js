@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Button, Space, Select, Row, Col, message, TimePicker } from 'antd';
+import { Input, Button, Space, Select, Row, Col, message} from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import {updateProcessApi} from '../services/apiService'
 import { format } from 'date-fns';
 import Form from 'antd/lib/form';
+import TimePicker from '../component/timePicker'
 
 
 const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -39,10 +40,11 @@ export default function ChapterForm({ courseId, onSuccess, processId, isAdd = tr
     const { classTime: origin, chapters  } = values;
     const classTime = origin.map(({ weekday, time }) => `${weekday} ${format(time, 'hh:mm:ss')}`);
     const req = { chapters, classTime, processId, courseId };
+    console.log(req)
 
     updateProcessApi(req).then((res) => {
       const { data } = res;
-
+      console.log(res)
       if (!!onSuccess && data) {
         onSuccess(true);
       }
