@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 export default function AddCourse() {
   const router = useRouter();
   const [courseId, setCourseId] = useState(null);
-  const [processId, setProcessId] = useState(null);
+  const [scheduleId, setScheduleId] = useState(null);
   const [availableNavigate, setAvailableNavigate] = useState([0]);
   const [currentStep, setCurrentStep] = useState(0);
   const moveToNex = () => {
@@ -18,12 +18,13 @@ export default function AddCourse() {
   const steps = [
     <AddCourseForm 
     onSuccess={(course) => {
+      console.log(course)
       setCourseId(course.id);
-      setProcessId(course.processId);
+      setScheduleId(course.scheduleId);
       moveToNex();
     }}
     />,
-    <ChapterForm courseId={courseId} processId={processId} onSuccess={moveToNex}/>,
+    <ChapterForm courseId={courseId} scheduleId={scheduleId} onSuccess={moveToNex}/>,
     <Result
       status="success"
       title="Successfully Create Course"

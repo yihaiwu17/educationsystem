@@ -14,7 +14,7 @@ import { useForm } from 'antd/lib/form/Form';
 import NumberWithUni from '../component/NumberWithUnit';
 import TextArea from 'antd/lib/input/TextArea';
 import ImgCrop from 'antd-img-crop';
-import { InboxOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { InboxOutlined, CloseCircleOutlined, KeyOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 
 const DurationUnit = ['hour', 'day', 'week', 'month', 'year'];
@@ -33,7 +33,7 @@ const DescriptionTextArea = styled(Form.Item)`
   text-area {
     height: 100%;
   }
-  `
+`;
 
 const UploadItem = styled(Form.Item)`
   .ant-upload.ant-upload-select-picture-card {
@@ -69,7 +69,6 @@ const UploadItem = styled(Form.Item)`
       color: red;
     }
   }
-
 `;
 
 const UploadInner = styled.div`
@@ -114,6 +113,7 @@ export default function AddCourseForm({ course, onSuccess }) {
   const [preview, setPreview] = useState(null);
   const [isAdd, setIsAdd] = useState(course === undefined);
   const [isUploading, setIsUploading] = useState(false);
+  const [showCode, setShowCode] = useState(true);
 
   const onChange = ({ fileList: newFileList, file }) => {
     const { status } = file;
@@ -121,12 +121,11 @@ export default function AddCourseForm({ course, onSuccess }) {
     if (file?.response) {
       const { url } = file.response;
 
-      form.setFieldsValue({ cover:url });
+      form.setFieldsValue({ cover: url });
     } else {
       form.setFieldsValue({ cover: course?.cover || '' });
-      // form.setFieldsValue({});
     }
-    console.log(file.response)
+
     setIsUploading(status === 'uploading');
     setFileList(newFileList);
 
@@ -159,11 +158,13 @@ export default function AddCourseForm({ course, onSuccess }) {
   };
 
   useEffect(() => {
-    courseCodeApi().then((res) => {
-      const courseCodes = res.data.data.courseCode;
-      form.setFieldsValue({ uid: [courseCodes] });
-    });
-
+    if (isAdd) {
+      courseCodeApi().then((res) => {
+        const courseCodes = res.data.data.courseCode;
+        form.setFieldsValue({ uid: [courseCodes] });
+        setShowCode(false);
+      });
+    }
     courseTypeApi().then((res) => {
       const courseType = res.data.data.courseType;
       setCourseType(courseType);
@@ -181,26 +182,38 @@ export default function AddCourseForm({ course, onSuccess }) {
       duration: values.duration.number,
       typeId: values.typeId,
       startTime: format(values.startTime, 'yyy-MM-dd'),
-      // startTime: '2021-01-22',
       teacherId: values.teacherId || course.teacherId,
       durationUnit: values.duration.unit,
     };
-    console.log(req);
+
     const response = isAdd ? addCourseApi(req) : updateCourseApi({ ...req, id: course.id });
-    console.log(response)
+
     const { data } = await response;
 
     if (!!data && !course) {
       setIsAdd(false);
     }
 
-    // const {id} = data;
-
     if (!!onSuccess && !!data) {
-      console.log(data)
       onSuccess(data.data);
     }
   };
+
+  useEffect(() => {
+    if (!!course) {
+      const values = {
+        ...course,
+        typeId: String(course.typeId),
+        teacherId: course.teacherName,
+        startTime: new Date(course.startTime),
+        duration: { number: course.duration, unit: course.durationUnit },
+      };
+
+      form.setFieldsValue(values);
+
+      setFileList([{ name: 'Cover Image', url: course.cover }]);
+    }
+  }, [course]);
 
   return (
     <>
@@ -216,7 +229,10 @@ export default function AddCourseForm({ course, onSuccess }) {
             <Form.Item
               label="Course Name"
               name="name"
-              rules={[{ required: true }, { max: 100, min: 3, message: 'Course name length must between 3-100 characters'  }]}
+              rules={[
+                { required: true },
+                { max: 100, min: 3, message: 'Course name length must between 3-100 characters' },
+              ]}
             >
               <Input type="text" placeholder="course name"></Input>
             </Form.Item>
@@ -259,7 +275,12 @@ export default function AddCourseForm({ course, onSuccess }) {
 
               <Col span={8}>
                 <Form.Item label="Course Code" name="uid" rules={[{ required: true }]}>
-                  <Input disabled type="text" placeholder="course code" />
+                  <Input
+                    disabled
+                    type="text"
+                    placeholder="course code"
+                    addonAfter={showCode ? <KeyOutlined style={{ cursor: 'pointer' }} /> : null}
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -306,7 +327,7 @@ export default function AddCourseForm({ course, onSuccess }) {
             </Form.Item>
           </Col>
           <Col span={16}>
-            <Row style={{ marginLeft: '-10px',height:'100%' }}>
+            <Row style={{ marginLeft: '-10px', height: '100%' }}>
               <Col span={12} style={{ position: 'relative' }}>
                 <DescriptionTextArea
                   label="Description"
@@ -316,15 +337,11 @@ export default function AddCourseForm({ course, onSuccess }) {
                     { min: 100, max: 1000, message: 'Description must between 100 and 1000' },
                   ]}
                 >
-                  <TextArea
-                    placeholder="Course description"
-                    style={{ height: '100%' }}
-
-                  ></TextArea>
+                  <TextArea placeholder="Course description" style={{ height: '100%' }}></TextArea>
                 </DescriptionTextArea>
               </Col>
               <Col span={12} style={{ position: 'relative' }}>
-                <UploadItem label="Cover" name="cover" style={{height:'100%'}}>
+                <UploadItem label="Cover" name="cover" style={{ height: '100%' }}>
                   <ImgCrop rotate aspect={16 / 9}>
                     <Upload
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"

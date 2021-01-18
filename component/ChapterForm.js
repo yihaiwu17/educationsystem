@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Button, Space, Select, Row, Col, message} from 'antd';
+import { Input, Button, Select, Row, Col, message } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import {updateProcessApi} from '../services/apiService'
+import { updateProcessApi, processById } from '../services/apiService';
 import { format } from 'date-fns';
 import Form from 'antd/lib/form';
-import TimePicker from '../component/timePicker'
-
+import TimePicker from '../component/timePicker';
 
 const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const clsTime = 'classTime';
 const cpts = 'chapters';
 const { Option } = Select;
 
-export default function ChapterForm({ courseId, onSuccess, processId, isAdd = true }) {
+export default function ChapterForm({ courseId, onSuccess, scheduleId, isAdd = true }) {
   const [form] = Form.useForm();
   const [selectedWeekdays, setSelectedWeekdays] = useState([]);
   const updateSelectedWeekdays = (namePath) => {
@@ -32,25 +31,44 @@ export default function ChapterForm({ courseId, onSuccess, processId, isAdd = tr
     [clsTime]: [{ weekday: '', time: '' }],
   };
   const onFinish = (values) => {
-    // if (!courseId && !processId) {
+    // if (!courseId && !scheduleId) {
     //   message.error('You must select a course to update!');
     //   return;
     // }
 
-    const { classTime: origin, chapters  } = values;
+    const { classTime: origin, chapters } = values;
     const classTime = origin.map(({ weekday, time }) => `${weekday} ${format(time, 'hh:mm:ss')}`);
-    const req = { chapters, classTime, processId, courseId };
-    console.log(req)
+    const req = { chapters, classTime, scheduleId, courseId };
 
     updateProcessApi(req).then((res) => {
       const { data } = res;
-      console.log(res)
+      console.log(res);
       if (!!onSuccess && data) {
         onSuccess(true);
       }
     });
   };
 
+  useEffect(() => {
+    (async () => {
+      if (!scheduleId || isAdd) {
+        return;
+      }
+      console.log(scheduleId);
+      const { data } = await processById({ id: scheduleId });
+      console.log(data);
+      if (!!data) {
+        const classTimes = data.data.classTime.map((item) => {
+          const [weekday, time] = item.split(' ');
+
+          return { weekday, time: new Date(`2020-11-11 ${time}`) };
+        });
+
+        form.setFieldsValue({ chapters: data.data.chapters, classTime: classTimes });
+        setSelectedWeekdays(classTimes.map((item) => item.weekday));
+      }
+    })();
+  }, [scheduleId]);
 
   return (
     <Form

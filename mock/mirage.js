@@ -13,7 +13,6 @@ const studentProfiles = require('../mock/data/student_profile.json');
 const sales = require('../mock/data/sales.json');
 const schedules = require('../mock/data/schedule.json');
 
-
 export function makeServer({ environment = 'test' } = {}) {
   let server = createServer({
     environment,
@@ -42,7 +41,6 @@ export function makeServer({ environment = 'test' } = {}) {
         studentCourses: hasMany(),
         type: belongsTo('studentType'),
       }),
-
     },
 
     seeds(server) {
@@ -60,14 +58,17 @@ export function makeServer({ environment = 'test' } = {}) {
 
     routes() {
       this.passthrough((request) => {
-        if (request.url === '/_next/static/development/_devPagesManifest.json' || request.url.includes('www.mocky.io')) return true;
+        if (
+          request.url === '/_next/static/development/_devPagesManifest.json' ||
+          request.url.includes('www.mocky.io')
+        )
+          return true;
       });
 
       this.namespace = 'api';
 
       this.get('/course/code', (schema) => {
-       
-        const courseCode =  Math.random().toString(32).split('.')[1];
+        const courseCode = Math.random().toString(32).split('.')[1];
         return new Response(
           200,
           {},
@@ -99,8 +100,9 @@ export function makeServer({ environment = 'test' } = {}) {
       this.get('/teachers', (schema, request) => {
         const { query } = request.queryParams;
         const all = schema.teachers.all();
-        let teacherInfo = all.filter((item) => !query || item.name.toLowerCase().includes(query)).models;
-        console.log(teacherInfo)
+        let teacherInfo = all.filter((item) => !query || item.name.toLowerCase().includes(query))
+          .models;
+        console.log(teacherInfo);
 
         return new Response(
           200,
@@ -133,7 +135,7 @@ export function makeServer({ environment = 'test' } = {}) {
               data: {
                 courseData,
               },
-              process: {
+              schedule: {
                 schedules,
               },
             }
@@ -142,16 +144,30 @@ export function makeServer({ environment = 'test' } = {}) {
       });
 
       this.get('/courses', (schema, request) => {
-        const limit = request.queryParams.limit;
-        const page = request.queryParams.page;
+        const { page, limit, ...others } = request.queryParams;
+        const courseResult = Object.entries(others).filter(([key, value]) => !!value);
         let courses = schema.courses.all().models;
-        
+
         const total = courses.length;
 
         if (limit && page) {
           const start = limit * (page - 1);
           const next = limit * page;
           courses = courses.slice(start, next);
+        }
+
+        if (courseResult.length) {
+          courses = courses.filter((item) =>
+            courseResult.every(([key, value]) => {
+              if (key === 'name') {
+                return item.name.includes(value);
+              } else if (key === 'type') {
+                return item.type.name === value;
+              } else {
+                return item[key] === value;
+              }
+            })
+          );
         }
 
         courses.forEach((item) => {
@@ -190,7 +206,7 @@ export function makeServer({ environment = 'test' } = {}) {
           durationUnit,
           teacherId,
         } = body;
-        const process = schema.schedules.create({
+        const schedule = schema.schedules.create({
           status: 0,
           current: 0,
           classTime: null,
@@ -214,7 +230,7 @@ export function makeServer({ environment = 'test' } = {}) {
           price,
           maxStudents,
           sales,
-          process,
+          schedule,
           star: 0,
           status: 0,
           duration,
@@ -224,22 +240,21 @@ export function makeServer({ environment = 'test' } = {}) {
           typeId,
           ctime: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
         });
- 
 
-        data.typeName = schema.courseTypes.findBy({id:typeId}).name;
-        data.processId = process.id;
-        console.log(data)
+        data.typeName = schema.courseTypes.findBy({ id: typeId }).name;
+        data.scheduleId = schedule.id;
+        console.log(data);
 
         return new Response(200, {}, { msg: 'success', code: 200, data });
       });
 
       this.post('/courses/update', (schema, req) => {
-        const { id, ...others} = JSON.parse(req.requestBody);
+        const { id, ...others } = JSON.parse(req.requestBody);
         const target = schema.courses.findBy({ id });
 
         if (target) {
           const data = target.update({
-            ...others
+            ...others,
           });
 
           data.attrs.typeName = data.type.name;
@@ -250,35 +265,41 @@ export function makeServer({ environment = 'test' } = {}) {
         }
       });
 
-      this.post('/courses/process', (schema, req) => {
+      this.get('/courses/schedules', (schema, req) => {
+        const id = req.queryParams.id;
+        const data = schema.schedules.findBy({ id });
+        return new Response(200, {}, { msg: 'success', code: 200, data });
+      });
+
+      this.post('/courses/schedules', (schema, req) => {
         const body = JSON.parse(req.requestBody);
-        const { processId, courseId } = body;
+        const { scheduleId, courseId } = body;
         let target;
 
-        if (!!processId || !!courseId) {
-          if (processId) {
-            target = schema.schedules.findBy({ id:processId });
-            console.log(target)
+        if (!!scheduleId || !!courseId) {
+          if (scheduleId) {
+            target = schema.schedules.findBy({ id: scheduleId });
+            console.log(target);
           } else {
-            target = schema.courses.findBy({  id:courseId }).schedule;
-            console.log(target)
+            target = schema.courses.findBy({ id: courseId }).schedule;
+            console.log(target);
           }
           const { classTime, chapters } = body;
 
           target.update({
             current: 0,
             status: 0,
-            chapters: chapters.map((item, index) => ({ ...item, id:index })),
+            chapters: chapters.map((item, index) => ({ ...item, id: index })),
             classTime,
           });
-          console.log('target',target)
+          console.log('target', target);
           return new Response(200, {}, { msg: 'success', code: 200, data: true });
         } else {
           return new Response(
             400,
             {},
             {
-              msg: `can\'t find process by course ${courseId} or processId ${processId} `,
+              msg: `can\'t find process by course ${courseId} or scheduleId ${scheduleId} `,
               code: 400,
             }
           );

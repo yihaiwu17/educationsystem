@@ -106,7 +106,15 @@ export const updateCourseApi = async (req) => {
 
 export const updateProcessApi = async (req) => {
   const res = await axiosApi
-    .post(firstPaths.courses+"/"+secondPaths.process, req)
+    .post(firstPaths.courses+"/"+secondPaths.schedules, req)
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
+export const processById = async (params) => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.courses+"/"+secondPaths.schedules,params))
     .then((res) => res)
     .catch((err) => errorHandler(err));
   return res;
