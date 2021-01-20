@@ -1,5 +1,5 @@
 // mirage.js
-import { format } from 'date-fns';
+import { format, subMonths } from 'date-fns';
 import { belongsTo, createServer, hasMany, Model, Response } from 'miragejs';
 import { firstPaths, secondPaths } from '../services/path';
 const students = require('../mock/data/student.json');
@@ -12,6 +12,7 @@ const studentTypes = require('../mock/data/student_type.json');
 const studentProfiles = require('../mock/data/student_profile.json');
 const sales = require('../mock/data/sales.json');
 const schedules = require('../mock/data/schedule.json');
+const teacherProfiles = require('./data/teacher_profile.json');
 
 export function makeServer({ environment = 'test' } = {}) {
   let server = createServer({
@@ -23,9 +24,13 @@ export function makeServer({ environment = 'test' } = {}) {
       student: Model.extend({
         studentCourses: hasMany(),
         type: belongsTo('studentType'),
+        profile: belongsTo('studentProfile'),
       }),
       courseType: Model,
-      teacher: Model,
+      teacherProfile: Model,
+      teacher: Model.extend({
+        profile: belongsTo('teacherProfile'),
+      }),
       sale: Model,
       schedule: Model,
       course: Model.extend({
@@ -46,14 +51,15 @@ export function makeServer({ environment = 'test' } = {}) {
     seeds(server) {
       users.forEach((user) => server.create('user', user));
       courseTypes.forEach((type) => server.create('courseType', type));
+      teacherProfiles.forEach((teacher) => server.create('teacherProfile', teacher));
       teachers.forEach((teacher) => server.create('teacher', teacher));
       sales.forEach((sale) => server.create('sale', sale));
       schedules.forEach((schedule) => server.create('schedule', schedule));
       courses.forEach((course) => server.create('course', course));
       studentCourses.forEach((course) => server.create('studentCourse', course));
       studentTypes.forEach((type) => server.create('studentType', type));
-      students.forEach((student) => server.create('student', student));
       studentProfiles.forEach((profile) => server.create('studentProfile', profile));
+      students.forEach((student) => server.create('student', student));
     },
 
     routes() {
@@ -162,9 +168,9 @@ export function makeServer({ environment = 'test' } = {}) {
               if (key === 'name') {
                 return item.name.includes(value);
               } else if (key === 'type') {
-                return item.type.name === value;
+                return item.type.name.toLowerCase() === value.toLowerCase();
               } else {
-                return item[key] === value;
+                return item[key].toLowerCase() === value.toLowerCase();
               }
             })
           );
@@ -424,6 +430,22 @@ export function makeServer({ environment = 'test' } = {}) {
         return new Response(200, {}, { code: 0, msg: 'success', data: true });
       });
 
+      this.get('/statistics/overview', (schema, req) => {
+        const courses = schema.courses.all().models;
+        const data = {
+          student: getPeopleStatistics(schema, 'students'),
+          teacher: getPeopleStatistics(schema, 'teachers'),
+          course: {
+            total: courses.length,
+            lastMonthAdded: schema.courses.where(
+              (item) => new Date(item.ctime) >= subMonths(new Date(), 1)
+            ).models.length,
+          },
+        };
+        console.log(data);
+        return new Response(200, {}, { msg: 'success', code: 200, data });
+      });
+
       this.post('/logout', () => {
         return new Response(
           200,
@@ -435,6 +457,29 @@ export function makeServer({ environment = 'test' } = {}) {
           }
         );
       });
+
+      function getPeopleStatistics(schema, type) {
+        const all = schema[type].all().models;
+        const male = all.filter((item) => item.profile?.gender === 1).length;
+        const female = all.filter((item) => item.profile?.gender === 2).length;
+        if (type === 'teachers') {
+          return {
+            total: all.length,
+            lastMonthAdded: schema.teachers.where(
+              (item) => new Date(item.ctime) >= subMonths(new Date(), 1)
+            ).models.length,
+            gender: { male, female, unknown: all.length - male - female },
+          };
+        } else {
+          return {
+            total: all.length,
+            lastMonthAdded: schema.students.where(
+              (item) => new Date(item.ctime) >= subMonths(new Date(), 1)
+            ).models.length,
+            gender: { male, female, unknown: all.length - male - female },
+          };
+        }
+      }
 
       this.post('/login', (schema, request) => {
         let attrs = JSON.parse(request.requestBody);

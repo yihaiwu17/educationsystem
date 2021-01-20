@@ -5,6 +5,7 @@ import { updateProcessApi, processById } from '../services/apiService';
 import { format } from 'date-fns';
 import Form from 'antd/lib/form';
 import TimePicker from '../component/timePicker';
+import FormItem from 'antd/lib/form/FormItem';
 
 const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const clsTime = 'classTime';
@@ -108,15 +109,17 @@ export default function ChapterForm({ courseId, onSuccess, scheduleId, isAdd = t
                       </Form.Item>
                     </Col>
                     <Col span={2}>
-                      <MinusCircleOutlined
-                        onClick={() => {
-                          if (fields.length > 1) {
-                            remove(field.name);
-                          } else {
-                            message.warn('You must set at least one class time');
-                          }
-                        }}
-                      />
+                      <FormItem>
+                        <MinusCircleOutlined
+                          onClick={() => {
+                            if (fields.length > 1) {
+                              remove(field.name);
+                            } else {
+                              message.warn('You must set at least one class time');
+                            }
+                          }}
+                        />
+                      </FormItem>
                     </Col>
                   </Row>
                 ))}
@@ -140,7 +143,7 @@ export default function ChapterForm({ courseId, onSuccess, scheduleId, isAdd = t
             {(fields, { add, remove }) => (
               <>
                 {fields.map((field) => (
-                  <Row key={field.key} align="baseline" gutter={20}>
+                  <Row key={field.key}  gutter={20}>
                     <Col span={8}>
                       <Form.Item
                         {...field}
@@ -168,16 +171,18 @@ export default function ChapterForm({ courseId, onSuccess, scheduleId, isAdd = t
                       </Form.Item>
                     </Col>
                     <Col span={2}>
-                      <MinusCircleOutlined
-                        onClick={() => {
-                          if (fields.length > 1) {
-                            updateSelectedWeekdays([clsTime, field.name, 'weekday']);
-                            remove(field.name);
-                          } else {
-                            message.warn('You must set at least one class time');
-                          }
-                        }}
-                      />
+                      <FormItem>
+                        <MinusCircleOutlined
+                          onClick={() => {
+                            if (fields.length > 1) {
+                              updateSelectedWeekdays([clsTime, field.name, 'weekday']);
+                              remove(field.name);
+                            } else {
+                              message.warn('You must set at least one class time');
+                            }
+                          }}
+                        />
+                      </FormItem>
                     </Col>
                   </Row>
                 ))}

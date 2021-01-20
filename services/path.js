@@ -6,7 +6,8 @@ export const firstPaths = {
   student:'student',
   courses:'courses',
   course:'course',
-  teachers:'teachers'
+  teachers:'teachers',
+  statistics:'statistics',
 };
 
 export const secondPaths = {
@@ -17,6 +18,7 @@ export const secondPaths = {
   type:'type',
   code:'code',
   schedules:'schedules',
+  overview:'overview',
 };
 
 export const createUrl = (paths, params) => {

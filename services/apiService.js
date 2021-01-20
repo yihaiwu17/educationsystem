@@ -119,3 +119,11 @@ export const processById = async (params) => {
     .catch((err) => errorHandler(err));
   return res;
 };
+
+export const getStatisticsOverview = async (params) => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.statistics+"/"+secondPaths.overview,params))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};

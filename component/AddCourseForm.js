@@ -129,12 +129,6 @@ export default function AddCourseForm({ course, onSuccess }) {
     setIsUploading(status === 'uploading');
     setFileList(newFileList);
 
-    // setIsUploading(file.status === 'uploading');
-    // setFileList(newFileList);
-    // console.log(file)
-    // if(file.status === 'done'){
-    //   form.setFieldsValue({cover:file.response.url})
-    // }
   };
 
   const onPreview = async (file) => {
@@ -151,10 +145,6 @@ export default function AddCourseForm({ course, onSuccess }) {
       previewImage: file.url || file.preview,
       previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
     });
-    // const image = new Image();
-    // image.src = file.url;
-    // const imgWindow = window.open(src);
-    // imgWindow.document.write(image.outerHTML);
   };
 
   useEffect(() => {
