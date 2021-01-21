@@ -127,3 +127,17 @@ export const getStatisticsOverview = async (params) => {
     .catch((err) => errorHandler(err));
   return res;
 };
+
+export const getStatisticsByStudent = async (params) => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.statistics+"/"+secondPaths.student,params))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
+export const getWorld = async () => {
+  return await axios.get(
+    'https://code.highcharts.com/mapdata/custom/world-palestine-highres.geo.json'
+  );
+};

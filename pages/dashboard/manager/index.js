@@ -3,7 +3,8 @@ import { DeploymentUnitOutlined, ReadOutlined, SolutionOutlined } from '@ant-des
 import { Card, Col, Progress, Row, Select } from 'antd';
 import AppLayout from '../../../component/Layout';
 import styled from 'styled-components';
-import { getStatisticsOverview } from '../../../services/apiService';
+import dynamic from 'next/dynamic';
+import { getStatisticsOverview,getStatisticsByStudent } from '../../../services/apiService';
 
 const IconCol = styled(Col)`
   display: flex;
@@ -43,15 +44,24 @@ const OverView = ({ style, icon, title, data }) => {
   );
 };
 
+const DistributionWithNoSSR = dynamic(() => import('../../../component/manager/distribution'), {
+  ssr: false,
+});
+
 export default function ManagerPage() {
   const [overview, setOverView] = useState(null);
+  const [studentStatistics,setStudentStatistics] = useState(null)
 
   useEffect(() => {
     getStatisticsOverview().then((res) => {
-      console.log(res);
       const { data } = res.data;
-      console.log(data);
       setOverView(data);
+    });
+
+    getStatisticsByStudent().then((res) => {
+      const  studentData  = res.data.data;
+      console.log(studentData)
+      setStudentStatistics(studentData)
     });
   }, []);
   return (
@@ -84,6 +94,18 @@ export default function ManagerPage() {
           </Col>
         </Row>
       )}
+      <Row gutter={[16,16]}>
+        <Col span={12}>
+          <Card
+            title='Distribution'
+          >
+            <DistributionWithNoSSR
+              data ={studentStatistics?.area}
+              title='student'
+            ></DistributionWithNoSSR>
+          </Card>
+        </Col>
+      </Row>
     </AppLayout>
   );
 }

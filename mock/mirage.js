@@ -1,5 +1,6 @@
 // mirage.js
 import { format, subMonths } from 'date-fns';
+import { countBy } from 'lodash';
 import { belongsTo, createServer, hasMany, Model, Response } from 'miragejs';
 import { firstPaths, secondPaths } from '../services/path';
 const students = require('../mock/data/student.json');
@@ -66,7 +67,10 @@ export function makeServer({ environment = 'test' } = {}) {
       this.passthrough((request) => {
         if (
           request.url === '/_next/static/development/_devPagesManifest.json' ||
-          request.url.includes('www.mocky.io')
+          request.url.includes('www.mocky.io') ||
+          request.url.includes('amap') ||
+          request.url.includes('highcharts') || 
+          request.url.includes('dashboard') 
         )
           return true;
       });
@@ -442,9 +446,18 @@ export function makeServer({ environment = 'test' } = {}) {
             ).models.length,
           },
         };
-        console.log(data);
         return new Response(200, {}, { msg: 'success', code: 200, data });
       });
+
+      this.get('/statistics/student', (schema, req) => {
+        const source = schema.students.all().models;
+        console.log(source)
+        const data = {
+          area: getStatisticList(countBy(source,'area'))
+        }
+        return new Response(200, {}, { msg: 'success', code: 200, data });
+      });
+
 
       this.post('/logout', () => {
         return new Response(
@@ -458,28 +471,6 @@ export function makeServer({ environment = 'test' } = {}) {
         );
       });
 
-      function getPeopleStatistics(schema, type) {
-        const all = schema[type].all().models;
-        const male = all.filter((item) => item.profile?.gender === 1).length;
-        const female = all.filter((item) => item.profile?.gender === 2).length;
-        if (type === 'teachers') {
-          return {
-            total: all.length,
-            lastMonthAdded: schema.teachers.where(
-              (item) => new Date(item.ctime) >= subMonths(new Date(), 1)
-            ).models.length,
-            gender: { male, female, unknown: all.length - male - female },
-          };
-        } else {
-          return {
-            total: all.length,
-            lastMonthAdded: schema.students.where(
-              (item) => new Date(item.ctime) >= subMonths(new Date(), 1)
-            ).models.length,
-            gender: { male, female, unknown: all.length - male - female },
-          };
-        }
-      }
 
       this.post('/login', (schema, request) => {
         let attrs = JSON.parse(request.requestBody);
@@ -509,4 +500,31 @@ export function makeServer({ environment = 'test' } = {}) {
     },
   });
   return server;
+}
+
+function getPeopleStatistics(schema, type) {
+  const all = schema[type].all().models;
+  const male = all.filter((item) => item.profile?.gender === 1).length;
+  const female = all.filter((item) => item.profile?.gender === 2).length;
+  if (type === 'teachers') {
+    return {
+      total: all.length,
+      lastMonthAdded: schema.teachers.where(
+        (item) => new Date(item.ctime) >= subMonths(new Date(), 1)
+      ).models.length,
+      gender: { male, female, unknown: all.length - male - female },
+    };
+  } else {
+    return {
+      total: all.length,
+      lastMonthAdded: schema.students.where(
+        (item) => new Date(item.ctime) >= subMonths(new Date(), 1)
+      ).models.length,
+      gender: { male, female, unknown: all.length - male - female },
+    };
+  }
+}
+
+function getStatisticList(obj){
+  return Object.entries(obj).map(([name,amount]) => ({name, amount}))
 }
