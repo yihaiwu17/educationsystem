@@ -20,6 +20,8 @@ export const secondPaths = {
   schedules:'schedules',
   overview:'overview',
   student:'student',
+  teacher:'teacher',
+  course:'course'
 };
 
 export const createUrl = (paths, params) => {

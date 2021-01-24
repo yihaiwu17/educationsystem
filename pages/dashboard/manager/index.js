@@ -4,7 +4,10 @@ import { Card, Col, Progress, Row, Select } from 'antd';
 import AppLayout from '../../../component/Layout';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
-import { getStatisticsOverview,getStatisticsByStudent } from '../../../services/apiService';
+import { getStatisticsOverview,getStatisticsByStudent,getStatisticsByTeacher,getStatisticsByCourse } from '../../../services/apiService';
+import {userType} from '../../../component/userType'
+import PieChart from '../../../component/manager/pieChart'
+import LineChart from '../../../component/manager/lineChart'
 
 const IconCol = styled(Col)`
   display: flex;
@@ -51,6 +54,10 @@ const DistributionWithNoSSR = dynamic(() => import('../../../component/manager/d
 export default function ManagerPage() {
   const [overview, setOverView] = useState(null);
   const [studentStatistics,setStudentStatistics] = useState(null)
+  const [teacherStatistics,setTeacherStatistics] = useState(null)
+  const [courseStatistics,setCourseStatistics] = useState(null)
+  const [distributionRole,setDistributionRole] = useState(userType.student)
+  const [selectedType, setSelectedType] = useState('studentType');
 
   useEffect(() => {
     getStatisticsOverview().then((res) => {
@@ -62,7 +69,18 @@ export default function ManagerPage() {
       const  studentData  = res.data.data;
       console.log(studentData)
       setStudentStatistics(studentData)
+      console.log(studentData)
     });
+
+    getStatisticsByTeacher().then((res) => {
+      const teacherData = res.data.data
+      setTeacherStatistics(teacherData)
+    })
+
+    getStatisticsByCourse().then((res) => {
+      const courseData = res.data.data
+      setCourseStatistics(courseData)
+    })
   }, []);
   return (
     <AppLayout>
@@ -98,11 +116,69 @@ export default function ManagerPage() {
         <Col span={12}>
           <Card
             title='Distribution'
+            extra={
+              <Select defaultValue='student' bordered={false} onSelect={setDistributionRole}>
+                <Select.Option value={userType.student}>Student</Select.Option>
+                <Select.Option value={userType.teacher}>Teacher</Select.Option>
+              </Select>
+            }
           >
             <DistributionWithNoSSR
-              data ={studentStatistics?.area}
-              title='student'
+              data ={
+                (distributionRole === userType.student ?
+                studentStatistics?.area : teacherStatistics?.country)}
+              title={distributionRole}
             ></DistributionWithNoSSR>
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card
+            title='Types'
+            extra={
+              <Select defaultValue={selectedType} bordered={false} onSelect={setSelectedType}>
+                <Select.Option value="studentType">Student Type</Select.Option>
+                <Select.Option value="courseType">Course Type</Select.Option>
+                <Select.Option value="gender">Gender</Select.Option>
+              </Select>
+            }
+          >
+            {selectedType === 'studentType' ? (
+              <PieChart
+              title={selectedType}
+              data={studentStatistics?.typeName}
+              ></PieChart>
+            ):selectedType === 'courseType' ? (
+              <PieChart data={courseStatistics?.typeName} title={selectedType} />
+            ):(
+              <Row gutter={16}>
+                <Col span={12}>
+                  <PieChart
+                    title='student gender'
+                    data={Object.entries(overview.student.gender).map(([name,amount]) => ({name,amount}))}
+                  ></PieChart>
+                </Col>
+                <Col span={12}>
+                  <PieChart
+                    title='teacher gender'
+                    data={Object.entries(overview.teacher.gender).map(([name,amount]) => ({name,amount}))}
+                  ></PieChart>
+                </Col>
+              </Row>
+            )}
+          </Card>
+        </Col>
+      </Row>
+      <Row gutter={[16, 16]}>
+        <Col span={12}>
+          <Card title='Increment'
+          >
+            <LineChart
+              data={{
+                [userType.student]: studentStatistics?.ctime,
+                [userType.teacher]: teacherStatistics?.ctime,
+                course: courseStatistics?.ctime,
+              }}
+            ></LineChart>
           </Card>
         </Col>
       </Row>

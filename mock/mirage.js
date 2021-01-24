@@ -451,9 +451,30 @@ export function makeServer({ environment = 'test' } = {}) {
 
       this.get('/statistics/student', (schema, req) => {
         const source = schema.students.all().models;
+        const data = {
+          area: getStatisticList(countBy(source,'area')),
+          typeName: getStatisticList(countBy(source,(item)=>item.type.name)),
+          ctime: getCtimeStatistics(source),
+        }
+        return new Response(200, {}, { msg: 'success', code: 200, data });
+      });
+
+
+      this.get('/statistics/teacher', (schema, req) => {
+        const source = schema.teachers.all().models;
         console.log(source)
         const data = {
-          area: getStatisticList(countBy(source,'area'))
+          country: getStatisticList(countBy(source,'country')),
+          ctime: getCtimeStatistics(source),
+        }
+        return new Response(200, {}, { msg: 'success', code: 200, data });
+      });
+
+      this.get('/statistics/course', (schema, req) => {
+        const source = schema.courses.all().models;
+        const data = {
+          typeName: getStatisticList(countBy(source,(item)=>item.type.name)),
+          ctime: getCtimeStatistics(source),
         }
         return new Response(200, {}, { msg: 'success', code: 200, data });
       });
@@ -527,4 +548,12 @@ function getPeopleStatistics(schema, type) {
 
 function getStatisticList(obj){
   return Object.entries(obj).map(([name,amount]) => ({name, amount}))
+}
+
+function getCtimeStatistics(source){
+  const ctimeValue = getStatisticList(countBy(source,(item)=>{
+    const index = item.ctime.lastIndexOf('-')
+      return item.ctime.slice(0,index)
+  }))
+    return ctimeValue
 }
