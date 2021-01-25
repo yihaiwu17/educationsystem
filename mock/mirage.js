@@ -1,6 +1,6 @@
 // mirage.js
 import { format, subMonths } from 'date-fns';
-import { countBy } from 'lodash';
+import { countBy, groupBy, values } from 'lodash';
 import { belongsTo, createServer, hasMany, Model, Response } from 'miragejs';
 import { firstPaths, secondPaths } from '../services/path';
 const students = require('../mock/data/student.json');
@@ -455,6 +455,15 @@ export function makeServer({ environment = 'test' } = {}) {
           area: getStatisticList(countBy(source,'area')),
           typeName: getStatisticList(countBy(source,(item)=>item.type.name)),
           ctime: getCtimeStatistics(source),
+          interest: getStatisticList(
+            source.map((item) => item.profile.interest)
+            .reduce((acc,cur) => {
+              const accumulate = accumulateFactory(acc)
+              cur.forEach(accumulate)
+              return acc; 
+            },{})
+          )
+          
         }
         return new Response(200, {}, { msg: 'success', code: 200, data });
       });
@@ -466,6 +475,24 @@ export function makeServer({ environment = 'test' } = {}) {
         const data = {
           country: getStatisticList(countBy(source,'country')),
           ctime: getCtimeStatistics(source),
+          skills: source.reduce((acc,cur) => {
+            cur.skills.forEach((skill) => {
+              const {name,level} = skill
+              
+              if(acc.hasOwnProperty(name)){
+                const target = acc[name].find((item) => item.level === level)
+
+                if(target){
+                  target.amount = target.amount + 1;
+                }else{
+                  acc[name].push({name:'level',level,amount:1})
+                }
+              }else{
+                acc[name] = [{name:'level',level,amount:1}]
+              }
+            })
+            return acc
+          },{})
         }
         return new Response(200, {}, { msg: 'success', code: 200, data });
       });
@@ -475,6 +502,20 @@ export function makeServer({ environment = 'test' } = {}) {
         const data = {
           typeName: getStatisticList(countBy(source,(item)=>item.type.name)),
           ctime: getCtimeStatistics(source),
+          classTime: Object.entries(
+            groupBy(
+              source.map((course) => {
+                const classTime = course.schedule.classTime
+                const typeName = course.type.name
+                
+                return{classTime,typeName,name: course.name}
+              }),(item) => item.typeName
+            )
+          ).map(([name,values]) => ({
+            name,
+            amount:values.length,
+            courses: values,
+          }))
         }
         return new Response(200, {}, { msg: 'success', code: 200, data });
       });
@@ -556,4 +597,14 @@ function getCtimeStatistics(source){
       return item.ctime.slice(0,index)
   }))
     return ctimeValue
+}
+
+function accumulateFactory(acc){
+  return (key) => {
+    if(acc.hasOwnProperty(key)){
+      acc[key] = acc[key] + 1;
+    }else{
+      acc[key] = 1;
+    }
+  }
 }

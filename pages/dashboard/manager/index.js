@@ -8,6 +8,7 @@ import { getStatisticsOverview,getStatisticsByStudent,getStatisticsByTeacher,get
 import {userType} from '../../../component/userType'
 import PieChart from '../../../component/manager/pieChart'
 import LineChart from '../../../component/manager/lineChart'
+import BarChart from '../../../component/manager/barChart'
 
 const IconCol = styled(Col)`
   display: flex;
@@ -67,9 +68,9 @@ export default function ManagerPage() {
 
     getStatisticsByStudent().then((res) => {
       const  studentData  = res.data.data;
-      console.log(studentData)
+
       setStudentStatistics(studentData)
-      console.log(studentData)
+
     });
 
     getStatisticsByTeacher().then((res) => {
@@ -180,6 +181,15 @@ export default function ManagerPage() {
               }}
             ></LineChart>
           </Card>
+        </Col>
+        <Col span={12}>
+            <Card title='Language'>
+              <BarChart
+                data={{interest: studentStatistics?.interest,
+                teacher: teacherStatistics?.skills}}
+              >
+              </BarChart>
+            </Card>
         </Col>
       </Row>
     </AppLayout>

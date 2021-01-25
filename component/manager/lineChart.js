@@ -40,7 +40,25 @@ export default function LineChart({ data }) {
     if (!data) {
       return;
     }
-    // const series =
+    /**
+     * 
+     */
+    console.log(data)
+    const series = Object.entries(data)
+      .filter(([_, data]) => !!data && !!data.length)
+      .map(([title, data]) => ({
+        name: title,
+        data: new Array(12).fill(0).map((_, index) => {
+          const month = index + 1;
+          const name = month > 9 ? month + '' : '0' + month;
+          const target = data.find((item) => item.name.split('-')[1] === name);
+          // console.log(target && target.amount);
+
+          return (target && target.amount) || 0;
+        }),
+      }));
+    setOptions({ series });
+    console.log(series)
   }, [data]);
 
   return <HighchartsReact highcharts={Highcharts} options={options}></HighchartsReact>;

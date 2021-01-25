@@ -30,7 +30,6 @@ export default function Distribution({ data, title }){
     useEffect(() => {
         (async () => {
           const res = await getWorld();
-            console.log(res)
           setWorld(res.data);
           setOptions({
             series: [{ mapData: res.data }],
