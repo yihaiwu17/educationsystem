@@ -9,6 +9,7 @@ import {userType} from '../../../component/userType'
 import PieChart from '../../../component/manager/pieChart'
 import LineChart from '../../../component/manager/lineChart'
 import BarChart from '../../../component/manager/barChart'
+import HeartChart from '../../../component/manager/heartChart'
 
 const IconCol = styled(Col)`
   display: flex;
@@ -81,6 +82,7 @@ export default function ManagerPage() {
     getStatisticsByCourse().then((res) => {
       const courseData = res.data.data
       setCourseStatistics(courseData)
+      console.log(courseData)
     })
   }, []);
   return (
@@ -190,6 +192,16 @@ export default function ManagerPage() {
               >
               </BarChart>
             </Card>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <Card title='Course Schedule'>
+            <HeartChart
+              data={courseStatistics?.classTime}
+              title='Course schedule per weekday'
+            ></HeartChart>
+          </Card>
         </Col>
       </Row>
     </AppLayout>
