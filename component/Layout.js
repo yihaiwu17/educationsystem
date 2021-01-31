@@ -1,6 +1,6 @@
 import React from 'react';
-import { Layout, Menu } from 'antd';
-import { MenuUnfoldOutlined, MenuFoldOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Layout, Menu,Dropdown  } from 'antd';
+import { MenuUnfoldOutlined, MenuFoldOutlined, LogoutOutlined,NotificationOutlined } from '@ant-design/icons';
 import '../styles/globals.css';
 import Router from 'next/router';
 import { generateKey, omitDetailPath, generateFactory, generatePath } from '../lib/side-nav';
@@ -9,6 +9,9 @@ import Link from 'next/link';
 import { withRouter } from 'next/router';
 import { memoize } from 'lodash';
 import AppBreadcrumb from '../lib/breadcrumb';
+import MessagePanel from './message/messagePanel'
+import {  Row } from 'antd';
+
 
 const { Header, Content, Sider } = Layout;
 
@@ -182,14 +185,19 @@ class AppLayout extends React.Component {
               zIndex: 10,
             }}
           >
-            <div onClick={this.toggle} style={{ margin: '25px', cursor: 'pointer' }}>
-              {this.state.collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            </div>
 
-            <div onClick={this.signOut} style={{ margin: '25px', cursor: 'pointer' }}>
+            <span onClick={this.toggle} style={{ margin: '25px', cursor: 'pointer' }}>
+              {this.state.collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            </span>
+
+            {/* <div onClick={this.signOut} style={{ margin: '25px', cursor: 'pointer' }}>
               {this.state.collapsed ? <LogoutOutlined /> : <LogoutOutlined />}
-            </div>
-          </Header>
+            </div> */}
+            
+            <Row>
+              <MessagePanel></MessagePanel>
+            </Row>
+            </Header>
 
           <Content
             style={{ background: '#fff', margin: '15px', padding: '15px', minHeight: 'auto' }}

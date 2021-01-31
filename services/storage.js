@@ -15,7 +15,8 @@ export class Storage {
   }
 
   get userType() {
-    return this.userInfo.data.loginType;
+
+    return this.userInfo?.data.role;
   }
 }
 

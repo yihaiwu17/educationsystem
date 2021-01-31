@@ -43,7 +43,7 @@ export default function LineChart({ data }) {
     /**
      * 
      */
-    console.log(data)
+
     const series = Object.entries(data)
       .filter(([_, data]) => !!data && !!data.length)
       .map(([title, data]) => ({
@@ -52,13 +52,13 @@ export default function LineChart({ data }) {
           const month = index + 1;
           const name = month > 9 ? month + '' : '0' + month;
           const target = data.find((item) => item.name.split('-')[1] === name);
-          // console.log(target && target.amount);
+
 
           return (target && target.amount) || 0;
         }),
       }));
     setOptions({ series });
-    console.log(series)
+
   }, [data]);
 
   return <HighchartsReact highcharts={Highcharts} options={options}></HighchartsReact>;

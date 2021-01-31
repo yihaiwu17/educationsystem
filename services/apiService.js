@@ -1,12 +1,31 @@
 import axios from 'axios';
 import { firstPaths, secondPaths, createUrl } from './path';
 import errorHandler from './errorCall';
+import storage from '../services/storage'
 
-const axiosApi = axios.create({
+export const axiosApi = axios.create({
   withCredentials: true,
   baseURL: 'http://localhost:3000/api',
   responseType: 'json',
 });
+
+axiosApi.interceptors.request.use((config) => {
+
+  if(config.url.includes('login') || config.url.includes('message')){
+    return{
+      ...config,
+      baseURL:'https://cms.chtoma.com/api',
+      headers:{
+      ...config.headers,
+      Authorization:'Bearer ' + storage?.token,
+      }
+    }
+
+  }
+  return config
+})
+
+
 
 export const studentApi = async (params) => {
   const res = await axiosApi
@@ -152,7 +171,22 @@ export const getStatisticsByCourse = async (params) => {
   return res;
 };
 
+export const getMessages = async (params) => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.message,params))
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};
 
+
+export const markAsRead = async (ids) => {
+  const res = await axiosApi
+    .post(firstPaths.message, {ids,status:1})
+    .then((res) => res)
+    .catch((err) => errorHandler(err));
+  return res;
+};
 
 export const getWorld = async () => {
   return await axios.get(

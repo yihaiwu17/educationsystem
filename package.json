@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "export API='https://cms.chtoma.com/api' && NODE_OPTIONS='--inspect' && next dev"
   },
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
@@ -15,6 +16,7 @@
     "antd-img-crop": "^3.13.2",
     "axios": "^0.21.1",
     "babel-plugin-import": "^1.13.1",
+    "crypto-js": "^4.0.0",
     "date-fns": "^2.16.1",
     "highcharts": "^8.2.2",
     "highcharts-react-official": "^3.0.0",

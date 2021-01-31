@@ -8,6 +8,7 @@ export const firstPaths = {
   course:'course',
   teachers:'teachers',
   statistics:'statistics',
+  message : 'message',
 };
 
 export const secondPaths = {

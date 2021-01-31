@@ -82,7 +82,7 @@ export default function ManagerPage() {
     getStatisticsByCourse().then((res) => {
       const courseData = res.data.data
       setCourseStatistics(courseData)
-      console.log(courseData)
+
     })
   }, []);
   return (

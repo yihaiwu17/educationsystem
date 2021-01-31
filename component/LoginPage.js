@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Checkbox, Radio, Row, Col, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import axios from 'axios';
 import Router from 'next/router';
 import styled from 'styled-components';
 import { userType } from './userType';
+import {axiosApi} from '../services/apiService'
+import {AES} from 'crypto-js'
 
 const StyledButton = styled(Button)`
   &&& {
@@ -25,13 +26,14 @@ class LoginPage extends React.Component {
 
   onFinish = async (values) => {
     try {
-      const response = await axios.post('/api/login', {
+      const response = await axiosApi.post('login', {
         email: values.email,
-        password: values.password,
-        loginType: values.loginType,
+        password: AES.encrypt(values.password,'cms').toString(),
+        role: values.loginType,
       });
-      if (response.status === 200) {
+      if (response.status === 201) {
         const account = response.data;
+        console.log(account)
         localStorage.setItem('cmsUser', JSON.stringify(account));
 
         Router.push('/dashboard');

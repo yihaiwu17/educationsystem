@@ -64,13 +64,16 @@ export function makeServer({ environment = 'test' } = {}) {
     },
 
     routes() {
+  
+
       this.passthrough((request) => {
         if (
           request.url === '/_next/static/development/_devPagesManifest.json' ||
           request.url.includes('www.mocky.io') ||
           request.url.includes('amap') ||
           request.url.includes('highcharts') || 
-          request.url.includes('dashboard') 
+          request.url.includes('dashboard') ||
+          request.url.includes('cms.chtoma.com')
         )
           return true;
       });
@@ -538,7 +541,7 @@ export function makeServer({ environment = 'test' } = {}) {
         let attrs = JSON.parse(request.requestBody);
         const result = schema.users.where({
           email: attrs.email,
-          password: attrs.password,
+          password: AES.encrypt(attrs.password,'cms').toString(),
           type: attrs.loginType,
         });
         console.log(result);
