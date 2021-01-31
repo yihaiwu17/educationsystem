@@ -174,7 +174,7 @@ export const getStatisticsByCourse = async (params) => {
 export const getMessages = async (params) => {
   const res = await axiosApi
     .get(createUrl(firstPaths.message,params))
-    .then((res) => res)
+    .then((res) => res.data)
     .catch((err) => errorHandler(err));
   return res;
 };
@@ -183,7 +183,7 @@ export const getMessages = async (params) => {
 export const markAsRead = async (ids) => {
   const res = await axiosApi
     .post(firstPaths.message, {ids,status:1})
-    .then((res) => res)
+    .then((res) => res.data)
     .catch((err) => errorHandler(err));
   return res;
 };

@@ -1,12 +1,14 @@
-import { Badge, Dropdown, Tabs, Row, Col, Button,Spin, Avatar,List  } from 'antd';
+import { Badge, Dropdown, Tabs, Row, Col, Button, Spin, Avatar, List } from 'antd';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
-import { BellOutlined,  UserOutlined } from '@ant-design/icons';
+import { BellOutlined, UserOutlined } from '@ant-design/icons';
 import storage from '../../services/storage';
 import { useListEffect } from '../../lib/list-effect';
-import { getMessages,markAsRead } from '../../services/apiService';
+import { getMessages, markAsRead } from '../../services/apiService';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import {useMsgStatistic} from '../../lib/provider'
+
 
 const MessageContainer = styled.div`
   height: 380px;
@@ -41,6 +43,31 @@ function Messages(props) {
     { type: props.type }
   );
 
+  useEffect(() => {
+    if (props.clearAll && data && data.length) {
+      const ids = data.filter((item) => item.status === 0).map((item) => item.id);
+
+      if (ids.length) {
+        markAsRead(ids).then((res) => {
+          if (res.data) {
+            setData(data.map((item) => ({ ...item, status: 1 })));
+          }
+
+          if (props.onRead) {
+            props.onRead(ids.length);
+          }
+        });
+      } else {
+        message.warn(`All of these ${props.type}s has been marked as read!`);
+      }
+    }
+  }, [props.clearAll]);
+
+  useEffect(() => {
+    if (!!props.message && props.message.type === props.type) {
+      setData([props.message, ...data]);
+    }
+  }, [props.message]);
 
   return (
     <InfiniteScroll
@@ -70,7 +97,7 @@ function Messages(props) {
                 return;
               }
 
-               ([item.id]).then((res) => {
+              [item.id].then((res) => {
                 if (res.data) {
                   const target = data.find((msg) => item.id === msg.id);
 
@@ -100,6 +127,11 @@ export default function MessagePanel() {
   const [activeType, setActiveType] = useState('notification');
   const types = ['notification', 'message'];
   const [message, setMessage] = useState(null);
+  const { msgStore, dispatch } = useMsgStatistic();
+  const [clean, setClean] = useState({
+    notification: 0,
+    message: 0,
+  });
   return (
     <Badge size="small" offset={[10, 0]}>
       <HeaderIcon>
@@ -132,10 +164,13 @@ export default function MessagePanel() {
                   <Tabs.TabPane key={type} tab={type}>
                     <MessageContainer id={type}>
                       <Messages
-                         type={type}
-                         scrollTarget={type}
-                        //  clearAll={clean[type]}
-                         message={message}
+                        type={type}
+                        scrollTarget={type}
+                        clearAll={clean[type]}
+                        onRead={(count) => {
+                          dispatch({ type: 'decrement', payload: { type, count } });
+                        }}
+                        message={message}
                       ></Messages>
                     </MessageContainer>
                   </Tabs.TabPane>
