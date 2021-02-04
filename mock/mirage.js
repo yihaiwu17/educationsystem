@@ -474,7 +474,7 @@ export function makeServer({ environment = 'test' } = {}) {
 
       this.get('/statistics/teacher', (schema, req) => {
         const source = schema.teachers.all().models;
-        console.log(source)
+       
         const data = {
           country: getStatisticList(countBy(source,'country')),
           ctime: getCtimeStatistics(source),

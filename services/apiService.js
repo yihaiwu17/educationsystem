@@ -3,9 +3,20 @@ import { firstPaths, secondPaths, createUrl } from './path';
 import errorHandler from './errorCall';
 import storage from '../services/storage'
 
+
+const getBaseUrl = () => {
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.NEXT_PUBLIC_API || 'http://localhost:3000/api';
+  } else {
+    return 'https://cms.chtoma.com/api';
+  }
+};
+const baseURL = getBaseUrl();
+
+
 export const axiosApi = axios.create({
   withCredentials: true,
-  baseURL: 'http://localhost:3000/api',
+  baseURL,
   responseType: 'json',
 });
 
@@ -187,6 +198,20 @@ export const markAsRead = async (ids) => {
     .catch((err) => errorHandler(err));
   return res;
 };
+
+export const getMessageStatistic = async (userId) => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.message + "/" + secondPaths.statistics,userId? {userId}:null))
+    .then((res) => res.data)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
+export function messageEvent(){
+  return new EventSource(`https://cms.chtoma.com/api/message/subscribe?userId=${storage.userId}`,{
+    withCredentials: true,
+  })
+}
 
 export const getWorld = async () => {
   return await axios.get(

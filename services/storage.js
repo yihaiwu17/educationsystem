@@ -18,6 +18,9 @@ export class Storage {
 
     return this.userInfo?.data.role;
   }
+  get userId(){
+    return this.userInfo?.data.userId;
+  }
 }
 
 export const storage = new Storage();

@@ -22,7 +22,8 @@ export const secondPaths = {
   overview:'overview',
   student:'student',
   teacher:'teacher',
-  course:'course'
+  course:'course',
+  statistics: 'statistics',
 };
 
 export const createUrl = (paths, params) => {

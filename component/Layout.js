@@ -1,6 +1,11 @@
 import React from 'react';
-import { Layout, Menu,Dropdown  } from 'antd';
-import { MenuUnfoldOutlined, MenuFoldOutlined, LogoutOutlined,NotificationOutlined } from '@ant-design/icons';
+import { Layout, Menu, Dropdown } from 'antd';
+import {
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  LogoutOutlined,
+  NotificationOutlined,
+} from '@ant-design/icons';
 import '../styles/globals.css';
 import Router from 'next/router';
 import { generateKey, omitDetailPath, generateFactory, generatePath } from '../lib/side-nav';
@@ -9,9 +14,8 @@ import Link from 'next/link';
 import { withRouter } from 'next/router';
 import { memoize } from 'lodash';
 import AppBreadcrumb from '../lib/breadcrumb';
-import MessagePanel from './message/messagePanel'
-import {  Row } from 'antd';
-
+import MessagePanel from './message/messagePanel';
+import { Row } from 'antd';
 
 const { Header, Content, Sider } = Layout;
 
@@ -142,7 +146,7 @@ class AppLayout extends React.Component {
     const { defaultOpenKeys, defaultSelectedKeys } = this.getMenuConfig(this.sideNave);
 
     return (
-      <Layout style={{height: '100vh' }}>
+      <Layout style={{ height: '100vh' }}>
         <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse}>
           <div
             style={{
@@ -185,19 +189,17 @@ class AppLayout extends React.Component {
               zIndex: 10,
             }}
           >
-
             <span onClick={this.toggle} style={{ margin: '25px', cursor: 'pointer' }}>
               {this.state.collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             </span>
 
-            {/* <div onClick={this.signOut} style={{ margin: '25px', cursor: 'pointer' }}>
-              {this.state.collapsed ? <LogoutOutlined /> : <LogoutOutlined />}
-            </div> */}
-            
-            <Row>
+            <Row align="middle">
               <MessagePanel></MessagePanel>
+              <div onClick={this.signOut} style={{ margin: '25px', cursor: 'pointer' }}>
+                {this.state.collapsed ? <LogoutOutlined /> : <LogoutOutlined />}
+              </div>
             </Row>
-            </Header>
+          </Header>
 
           <Content
             style={{ background: '#fff', margin: '15px', padding: '15px', minHeight: 'auto' }}

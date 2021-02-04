@@ -1,14 +1,91 @@
-import { Badge, Dropdown, Tabs, Row, Col, Button, Spin, Avatar, List } from 'antd';
+import {
+  Badge,
+  Dropdown,
+  Tabs,
+  Row,
+  Col,
+  Button,
+  Spin,
+  Avatar,
+  List,
+  Space,
+  notification,
+} from 'antd';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
 import { BellOutlined, UserOutlined } from '@ant-design/icons';
 import storage from '../../services/storage';
 import { useListEffect } from '../../lib/list-effect';
-import { getMessages, markAsRead } from '../../services/apiService';
+import {
+  getMessages,
+  markAsRead,
+  getMessageStatistic,
+  messageEvent,
+} from '../../services/apiService';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import {useMsgStatistic} from '../../lib/provider'
+import { useMsgStatistic } from '../../lib/provider';
+import { formatDistanceToNow } from 'date-fns';
 
+const TabPane = styled(Tabs.TabPane)`
+  position: relative;
+  .ant-list-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    &:hover {
+      background: #1890ff45;
+    }
+  }
+  .ant-list-item-meta-title {
+    margin-bottom: 0;
+  }
+  .ant-list-item-action {
+    margin: 0 0 0 48px;
+  }
+  .ant-list-item-meta-avatar {
+    align-self: flex-end;
+  }
+  .ant-list-item-meta-description {
+    margin: 5px 0;
+    white-space: normal;
+    display: -webkit-box;
+    max-height: 3em;
+    max-width: 100%;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ant-list-item-meta {
+    margin-bottom: 0;
+  }
+`;
+
+const Footer = styled(Row)`
+  height: 50px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  .ant-col {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:first-child {
+      box-shadow: 1px 0 0 0 #f0f0f0;
+    }
+  }
+  button {
+    border: none;
+  }
+  border-radius: 0 0 4px 4px;
+  border: 1px solid #f0f0f0;
+  border-left: none;
+  border-right: none;
+  background: #fff;
+  z-index: 9;
+`;
 
 const MessageContainer = styled.div`
   height: 380px;
@@ -37,8 +114,8 @@ const HeaderIcon = styled.span`
 
 function Messages(props) {
   const { paginator, setPaginator, hasMore, data, setData } = useListEffect(
-    getMessages.bind(this),
-    'message',
+    getMessages,
+    'messages',
     false,
     { type: props.type }
   );
@@ -83,6 +160,7 @@ function Messages(props) {
       scrollableTarget={props.scrollTarget}
     >
       <List
+        style={{ paddingLeft: '5px' }}
         itemLayout="vertical"
         dataSource={data}
         renderItem={(item, index) => (
@@ -97,7 +175,7 @@ function Messages(props) {
                 return;
               }
 
-              [item.id].then((res) => {
+              markAsRead([item.id]).then((res) => {
                 if (res.data) {
                   const target = data.find((msg) => item.id === msg.id);
 
@@ -132,8 +210,49 @@ export default function MessagePanel() {
     notification: 0,
     message: 0,
   });
+
+  useEffect(() => {
+    getMessageStatistic().then((res) => {
+      const { data } = res;
+
+      if (!!data) {
+        const {
+          receive: { notification, message },
+        } = data;
+
+        dispatch({ type: 'increment', payload: { type: 'message', count: message.unread } });
+        dispatch({
+          type: 'increment',
+          payload: { type: 'notification', count: notification.unread },
+        });
+      }
+    });
+
+    const sse = messageEvent();
+    sse.onmessage = (event) => {
+      let { data } = event;
+      data = JSON.parse(data || {});
+
+      if (data.type !== 'heartbeat') {
+        const content = data.content;
+        if (content.type === 'message') {
+          notification.info({
+            message: `You have a message from ${content.from.nickname}`,
+            description: content.content,
+          });
+        }
+        setMessage(content);
+        dispatch({ type: 'increment', payload: { type: content.type, count: 1 } });
+      }
+    };
+    return () => {
+      sse.close();
+      dispatch({ type: 'reset' });
+    };
+  }, []);
+
   return (
-    <Badge size="small" offset={[10, 0]}>
+    <Badge size="small" offset={[10, 0]} count={msgStore.total}>
       <HeaderIcon>
         <Dropdown
           overlayStyle={{
@@ -161,7 +280,7 @@ export default function MessagePanel() {
                 animated
               >
                 {types.map((type) => (
-                  <Tabs.TabPane key={type} tab={type}>
+                  <TabPane key={type} tab={`${type} (${msgStore[type]})`}>
                     <MessageContainer id={type}>
                       <Messages
                         type={type}
@@ -173,19 +292,20 @@ export default function MessagePanel() {
                         message={message}
                       ></Messages>
                     </MessageContainer>
-                  </Tabs.TabPane>
+                  </TabPane>
                 ))}
               </Tabs>
-              <Row justify="space-between" align="middle">
+              <Footer justify="space-between" align="middle">
                 <Col span={12}>
-                  <Button>Mark all as read</Button>
+                  <Button onClick={() => setClean({...clean,[activeType]: ++clean[activeType]})}
+                    >Mark all as read</Button>
                 </Col>
                 <Col span={12}>
                   <Button>
                     <Link href={`/dashboard/${storage.userType}/message`}>View history</Link>
                   </Button>
                 </Col>
-              </Row>
+              </Footer>
             </>
           }
         >
