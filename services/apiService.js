@@ -193,7 +193,7 @@ export const getMessages = async (params) => {
 
 export const markAsRead = async (ids) => {
   const res = await axiosApi
-    .post(firstPaths.message, {ids,status:1})
+    .post(firstPaths.message, {status:1,ids})
     .then((res) => res.data)
     .catch((err) => errorHandler(err));
   return res;
