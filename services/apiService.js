@@ -22,7 +22,7 @@ export const axiosApi = axios.create({
 
 axiosApi.interceptors.request.use((config) => {
 
-  if(config.url.includes('login') || config.url.includes('message')){
+  if(config.url.includes('login') || config.url.includes('message') || config.url.includes('class')){
     return{
       ...config,
       baseURL:'https://cms.chtoma.com/api',
@@ -212,6 +212,15 @@ export function messageEvent(){
     withCredentials: true,
   })
 }
+
+export const getClassSchedule = async (userId) => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.class + "/" + secondPaths.schedule,userId))
+    .then((res) => res.data)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
 
 export const getWorld = async () => {
   return await axios.get(
