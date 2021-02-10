@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { userType } from './userType';
 import {axiosApi} from '../services/apiService'
 import {AES} from 'crypto-js'
+import Header from '../component/home/header'
 
 const StyledButton = styled(Button)`
   &&& {
@@ -53,6 +54,7 @@ class LoginPage extends React.Component {
 
     return (
       <>
+      <Header></Header>
         <Row justify="center" style={{ marginTop: '5%' }}>
           <Col span={12}>
             <Form

@@ -14,8 +14,24 @@ import {
   addYears,
   differenceInCalendarDays,
   isSameDay,
+  getMonth,
+  getYear,
 } from 'date-fns';
 import { ClockCircleOutlined, NotificationFilled } from '@ant-design/icons';
+
+
+const courseTypeColors = [
+  'magenta',
+  'volcano',
+  'orange',
+  'gold',
+  'green',
+  'cyan',
+  'crimson',
+  'purple',
+  'red',
+  'lime',
+];
 
 const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -77,9 +93,9 @@ function generateClassCalendar(course) {
 
 export default function schedulePage() {
   const [data, setData] = useState([]);
+  const [notifyInfo, setNotifyInfo] = useState(null);
 
   const dateCellRender = (current) => {
-
     const listData = data
       .map((course) => {
         const { calendar } = course;
@@ -89,37 +105,116 @@ export default function schedulePage() {
       })
       .filter((item) => !!item);
 
-
     return (
       <>
         {listData.map((item, index) => (
-          <Row gutter={[6, 6]} key={index} style={{ fontSize: 12 }}>
+          <Row
+            gutter={[6, 6]}
+            key={index}
+            style={{ fontSize: 12 }}
+            onClick={() => setNotifyInfo(item)}
+          >
             <Col span={1}>
               <ClockCircleOutlined />
             </Col>
             <Col span={8} offset={1}>
               {item.class.time}
             </Col>
-            <Col offset={1}>{item.name}</Col>
+            <Col offset={1}
+              style={{color:courseTypeColors[item.type[0]?.id % 9]}}
+            >{item.name}</Col>
           </Row>
         ))}
       </>
     );
   };
 
+  const monthCellRender = (current) => {
+    const month = getMonth(current);
+    const year = getYear(current);
+    const result = data
+      .map((course) => {
+        const result = course.calendar.filter((item) => {
+          const classMonth = getMonth(item.date);
+          const classYear = getYear(item.date);
+
+          return classYear === year && classMonth === month;
+        });
+        const total = result.length;
+
+        return !!total ? { ...course, statistics: { total } } : null;
+      })
+      .filter((item) => !!item);
+
+    return result.length ? (
+      <>
+        {result.map((course) => (
+          <Row gutter={[6, 6]} key={course.id}>
+            <Col>
+              <b>{course.name}</b>
+            </Col>
+            <Col offset={1}>{course.statistics.total} lessons</Col>
+          </Row>
+        ))}
+      </>
+    ) : null;
+  };
+
   useEffect(() => {
     getClassSchedule(storage.userId).then((res) => {
       const { data } = res;
       const result = data.map((course) => ({ ...course, calendar: generateClassCalendar(course) }));
-      console.log(result);
+
       setData(result);
     });
   }, []);
   return (
     <AppLayout>
       <Card title="My Class Schedule">
-        <Calendar dateCellRender={dateCellRender} />
+        <Calendar dateCellRender={dateCellRender} monthCellRender={monthCellRender} />
       </Card>
+
+      <Modal
+        title="Class Info"
+        visible={!!notifyInfo}
+        footer={null}
+        onCancel={() => setNotifyInfo(null)}
+      >
+        <Descriptions>
+        <Descriptions.Item span={8} label="Course Name">
+          {notifyInfo?.name}
+        </Descriptions.Item>
+        <Descriptions.Item span={8} label="Chapter N.O">
+          {notifyInfo?.schedule.chapters.findIndex((item) => item.id === notifyInfo?.class.chapter?.id)+1}
+        </Descriptions.Item>
+        <Descriptions.Item span={8} label="Course Type">
+          {notifyInfo?.type[0]?.name}
+        </Descriptions.Item>
+        <Descriptions.Item span={8} label="Teacher Name">
+          {notifyInfo?.teacherName}
+        </Descriptions.Item>
+        <Descriptions.Item span={8} label="Class Time">
+          {notifyInfo?.class.time}
+
+          <Tooltip
+            title="Remend me"
+          >
+            <NotificationFilled
+              style={{color:'#1890ff',marginLeft:10,cursor:'pointer'}}
+              onClick={() => {
+                setNotifyInfo(null)
+              }}
+            ></NotificationFilled>
+          </Tooltip>
+        </Descriptions.Item>
+        <Descriptions.Item span={8} label="Chapter Name">
+          {notifyInfo?.class.chapter?.name}
+        </Descriptions.Item>
+        <Descriptions.Item span={12} label="Chapter Content">
+          {notifyInfo?.class.chapter?.content}
+        </Descriptions.Item>
+        </Descriptions>
+      </Modal>
     </AppLayout>
   );
 }
