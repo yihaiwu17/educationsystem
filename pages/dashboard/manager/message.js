@@ -95,7 +95,7 @@ export default function MessagePage() {
                       </Space>
                     }
                     onClick={() => {
-                      if(item.status ===1) {
+                      if(item.status === 1) {
                         return;
                       }
 

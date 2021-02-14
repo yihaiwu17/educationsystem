@@ -134,6 +134,14 @@ export const updateCourseApi = async (req) => {
   return res;
 };
 
+export const signUp = async (req) => {
+  const res = await axiosApi
+    .post(firstPaths.signUp, req)
+    .then((res) => res.data)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
 export const updateProcessApi = async (req) => {
   const res = await axiosApi
     .post(firstPaths.courses+"/"+secondPaths.schedules, req)
@@ -184,7 +192,7 @@ export const getStatisticsByCourse = async (params) => {
 
 export const getMessages = async (params) => {
   const res = await axiosApi
-    .get(createUrl(firstPaths.message,params))
+    .get(createUrl(firstPaths.message,{...params}))
     .then((res) => res.data)
     .catch((err) => errorHandler(err));
   return res;
@@ -193,7 +201,7 @@ export const getMessages = async (params) => {
 
 export const markAsRead = async (ids) => {
   const res = await axiosApi
-    .post(firstPaths.message, {status:1,ids})
+    .put(firstPaths.message, {status:1,ids})
     .then((res) => res.data)
     .catch((err) => errorHandler(err));
   return res;

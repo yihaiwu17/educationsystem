@@ -10,6 +10,7 @@ export const firstPaths = {
   statistics:'statistics',
   message : 'message',
   class:'class',
+  signUp:'signup', 
 };
 
 export const secondPaths = {
