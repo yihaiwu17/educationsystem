@@ -77,8 +77,8 @@ export default function CourseDetail() {
     console.log(courseDetail);
     const info = courseDetail.data.data.courseData;
     const saleInfo = courseDetail.data.data.courseData.sales;
-    const currentSchedules = courseDetail.data.process.schedules;
-    const currentStep = courseDetail.data.process.schedules.chapters;
+    const currentSchedules = courseDetail.data.schedule.schedules;
+    const currentStep = courseDetail.data.schedule.schedules.chapters;
     const saleDetail = [
       { label: 'Price', value: saleInfo.price },
       { label: 'Batch', value: saleInfo.batches },
@@ -89,8 +89,8 @@ export default function CourseDetail() {
     setInfo(info);
     setCurrentSchedules(currentSchedules);
     setActiveChapterIndex(
-      courseDetail.data.process.schedules.chapters.findIndex(
-        (item) => item.id === courseDetail.data.process.schedules.current
+      courseDetail.data.schedule.schedules.chapters.findIndex(
+        (item) => item.id === courseDetail.data.schedule.schedules.current
       )
     );
     setCurrentStep(currentStep);

@@ -1,7 +1,7 @@
 import { UserOutlined } from '@ant-design/icons';
 import { Button, Col, Form, Input, Radio, Row, Space, Typography } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
-import { omit, values } from 'lodash';
+import { omit } from 'lodash';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Checkbox, Radio, Row, Col, message } from 'antd';
+import React from 'react';
+import { Form, Input, Button, Checkbox, Radio, Row, Col, message,Typography,Space } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import Router from 'next/router';
 import styled from 'styled-components';
@@ -7,10 +7,23 @@ import { userType } from './userType';
 import {axiosApi} from '../services/apiService'
 import {AES} from 'crypto-js'
 import Header from '../component/home/header'
+import Link from 'next/link';
+
+const { Title } = Typography;
 
 const StyledButton = styled(Button)`
   &&& {
     width: 100%;
+  }
+`;
+
+ const StyledTitle = styled(Title)`
+  text-align: center;
+  margin: 0.5em 0;
+  @media (max-width: 700px) {
+    margin-top: 2em;
+    font-size: 18px !important;
+    padding-bottom: 0;
   }
 `;
 
@@ -55,8 +68,11 @@ class LoginPage extends React.Component {
     return (
       <>
       <Header></Header>
-        <Row justify="center" style={{ marginTop: '5%' }}>
-          <Col span={12}>
+
+      <StyledTitle>Course Management Assistant</StyledTitle>
+
+        <Row justify="center" >
+          <Col md={8} sm={24}>
             <Form
               name="basic"
               initialValues={{
@@ -65,8 +81,6 @@ class LoginPage extends React.Component {
               onFinish={this.onFinish}
               onFinishFailed={this.onFinishFailed}
             >
-              <h1>课程管理助手</h1>
-
               <Form.Item
                 name="loginType"
                 initialValue="student"
@@ -122,7 +136,7 @@ class LoginPage extends React.Component {
                 <Input.Password placeholder="Password" prefix={<LockOutlined />} />
               </Form.Item>
 
-              <Form.Item>
+              <Form.Item style={{marginBottom:'0px'}}>
                 <Form.Item name="remember" valuePropName="checked">
                   <Checkbox>Remember me</Checkbox>
                 </Form.Item>
@@ -134,6 +148,11 @@ class LoginPage extends React.Component {
                 </StyledButton>
               </Form.Item>
             </Form>
+
+            <Space>
+            <span>No account?</span>
+            <Link href="/signup">Sign up</Link>
+          </Space>
           </Col>
         </Row>
       </>
