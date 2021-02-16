@@ -21,6 +21,10 @@ export class Storage {
   get userId(){
     return this.userInfo?.data.userId;
   }
+
+  deleteUserInfo(){
+    localStorage.removeItem(this.key)
+  }
 }
 
 export const storage = new Storage();

@@ -102,7 +102,7 @@ const TabNavContainer = styled.div`
   }
 `;
 
-const HeaderIcon = styled.span`
+export const HeaderIcon = styled.span`
   font-size: 18px;
   color: #fff;
   cursor: pointer;
