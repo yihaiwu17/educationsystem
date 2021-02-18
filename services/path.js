@@ -11,6 +11,7 @@ export const firstPaths = {
   message : 'message',
   class:'class',
   signUp:'signup', 
+  profile: 'profile',
 };
 
 export const secondPaths = {

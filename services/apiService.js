@@ -22,7 +22,7 @@ export const axiosApi = axios.create({
 
 axiosApi.interceptors.request.use((config) => {
 
-  if(config.url.includes('login') || config.url.includes('message') || config.url.includes('class')){
+  if(config.url.includes('login') || config.url.includes('logout') || config.url.includes('message') || config.url.includes('class') || config.url.includes('profile')){
     return{
       ...config,
       baseURL:'https://cms.chtoma.com/api',
@@ -36,6 +36,22 @@ axiosApi.interceptors.request.use((config) => {
   return config
 })
 
+
+export const logout = async () => {
+  const res = await axiosApi
+    .post(createUrl(firstPaths.logout, {}))
+    .then((res) => res.data)
+    .catch((err) => errorHandler(err));
+  return res;
+};
+
+export const getProfileByUserId = async (userId,userRole) => {
+  const res = await axiosApi
+    .get(createUrl(firstPaths.profile, {userId,role: userRole || storage.userType}))
+    .then((res) => res.data)
+    .catch((err) => errorHandler(err));
+  return res;
+};
 
 
 export const studentApi = async (params) => {
@@ -209,7 +225,7 @@ export const markAsRead = async (ids) => {
 
 export const getMessageStatistic = async (userId) => {
   const res = await axiosApi
-    .get(createUrl(firstPaths.message + "/" + secondPaths.statistics,userId? {userId}:null))
+    .get(createUrl(firstPaths.message + "/" + secondPaths.statistics, userId ? {userId}:null))
     .then((res) => res.data)
     .catch((err) => errorHandler(err));
   return res;

@@ -45,7 +45,7 @@ class LoginPage extends React.Component {
         password: AES.encrypt(values.password,'cms').toString(),
         role: values.loginType,
       });
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
         const account = response.data;
         console.log(account)
         localStorage.setItem('cmsUser', JSON.stringify(account));

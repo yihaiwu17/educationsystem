@@ -74,6 +74,7 @@ export function makeServer({ environment = 'test' } = {}) {
           request.url.includes('highcharts') || 
           request.url.includes('dashboard') ||
           request.url.includes('cms.chtoma.com')
+
         )
           return true;
       });

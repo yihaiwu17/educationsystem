@@ -16,6 +16,7 @@ import { memoize } from 'lodash';
 import AppBreadcrumb from '../lib/breadcrumb';
 import MessagePanel from './message/messagePanel';
 import { Row } from 'antd';
+import UserIcon from './home/user-icon';
 
 const { Header, Content, Sider } = Layout;
 
@@ -36,17 +37,17 @@ class AppLayout extends React.Component {
     });
   };
 
-  signOut = async () => {
-    await fetch('/api/logout', {
-      method: 'post',
-    }).then((response) => {
-      if (response.status === 200) {
-        window.localStorage.removeItem('cmsUser');
-        window.localStorage.removeItem('token');
-        Router.push('/');
-      }
-    });
-  };
+  // signOut = async () => {
+  //   await fetch('/api/logout', {
+  //     method: 'post',
+  //   }).then((response) => {
+  //     if (response.status === 200) {
+  //       window.localStorage.removeItem('cmsUser');
+  //       window.localStorage.removeItem('token');
+  //       Router.push('/');
+  //     }
+  //   });
+  // };
 
   renderMenuItems(data, parent = '') {
     const userType = this.props.router.pathname.split('/')[2];
@@ -180,7 +181,6 @@ class AppLayout extends React.Component {
             style={{
               display: 'flex',
               justifyContent: 'space-between',
-              padding: 4,
               color: 'white',
               fontSize: '20px',
               alignItems: 'center',
@@ -189,15 +189,13 @@ class AppLayout extends React.Component {
               zIndex: 10,
             }}
           >
-            <span onClick={this.toggle} style={{ margin: '25px', cursor: 'pointer' }}>
+            <span onClick={this.toggle} style={{  cursor: 'pointer' }}>
               {this.state.collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             </span>
 
             <Row align="middle">
               <MessagePanel></MessagePanel>
-              <div onClick={this.signOut} style={{ margin: '25px', cursor: 'pointer' }}>
-                {this.state.collapsed ? <LogoutOutlined /> : <LogoutOutlined />}
-              </div>
+              <UserIcon></UserIcon>
             </Row>
           </Header>
 
